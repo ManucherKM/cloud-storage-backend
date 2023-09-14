@@ -1,10 +1,10 @@
-import { IsEmail, Matches, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, Matches, IsString, IsNotEmpty } from 'class-validator';
 
 const passwordRegex = new RegExp(
   '^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*_])(?=.{8,32}$)',
 );
 
-export class CreateUserDto {
+export class LoginDto {
   @IsEmail()
   email: string;
 
@@ -13,5 +13,5 @@ export class CreateUserDto {
 
   @IsString()
   @IsNotEmpty()
-  activationKey: string;
+  token: string;
 }

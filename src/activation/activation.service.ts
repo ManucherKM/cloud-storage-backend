@@ -5,8 +5,8 @@ import { UserService } from '@/user/user.service';
 export class ActivationService {
   constructor(private readonly userService: UserService) {}
 
-  async activationAccount(activationKey: string) {
-    const foundUser = await this.userService.findByActivationKey(activationKey);
+  async activationAccount(key: string) {
+    const foundUser = await this.userService.findByActivationKey(key);
     foundUser.isActivated = true;
     await foundUser.save();
   }

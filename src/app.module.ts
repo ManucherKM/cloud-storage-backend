@@ -1,15 +1,14 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { UserModule } from './user/user.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { ActivationModule } from './activation/activation.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
     MongooseModule.forRoot(process.env.MONGODB_URL),
-    UserModule,
     MailerModule.forRoot({
       transport: {
         host: 'smtp.gmail.com',
@@ -19,6 +18,7 @@ import { ActivationModule } from './activation/activation.module';
         },
       },
     }),
+    AuthModule,
     ActivationModule,
   ],
   controllers: [],
