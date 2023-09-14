@@ -6,7 +6,7 @@ import { verify } from 'hcaptcha';
 import { hash, compare } from 'bcrypt';
 import { v4 } from 'uuid';
 import { LoginDto } from './dto/login.dto';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService } from '@/jwt/jwt.service';
 
 @Injectable()
 export class AuthService {
@@ -77,14 +77,6 @@ export class AuthService {
     return success;
   }
 
-  private convertPayloadToString<T>(payload: Partial<T>) {
-    return JSON.stringify(payload);
-  }
-
-  private generateAccessToken(payload: string) {
-    return this.jwtService.sign(payload);
-  }
-
   async login(loginDto: LoginDto) {
     const foundUser = await this.userService.findByEmail(loginDto.email);
 
@@ -101,12 +93,26 @@ export class AuthService {
       throw new BadRequestException('Incorrect login or password.');
     }
 
-    const payload = this.convertPayloadToString<LoginDto>({
+    const userId = foundUser._id;
+
+    const payload = {
+      userId,
       email: loginDto.email,
-    });
+    };
 
-    const accessToken = this.generateAccessToken(payload);
+    const refreshToken = await this.jwtService.generateRefreshToken(
+      userId,
+      payload,
+    );
 
-    return accessToken;
+    const accessToken = await this.jwtService.generateAccessToken(
+      refreshToken,
+      payload,
+    );
+
+    return {
+      refreshToken,
+      accessToken,
+    };
   }
 }
