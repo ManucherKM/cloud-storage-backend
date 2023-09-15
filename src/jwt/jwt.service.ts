@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import jwt from 'jsonwebtoken';
+import * as jwt from 'jsonwebtoken';
 import { Jwt } from './entities/jwt.entity';
 import { Model, Types } from 'mongoose';
 import { UserService } from '@/user/user.service';
@@ -23,7 +23,7 @@ export class JwtService {
     refreshToken: string,
     payload: string | Object | Buffer,
   ) {
-    const isValid = await this.validateToken('access', refreshToken);
+    const isValid = await this.validateToken('refresh', refreshToken);
 
     if (!isValid) {
       throw new BadRequestException('Invalid refresh token.');
@@ -49,7 +49,7 @@ export class JwtService {
     const foundUser = await this.userService.findById(data.userId);
 
     if (!foundUser || !foundUser.isActivated) {
-      throw new BadRequestException('Invalid user');
+      throw new BadRequestException('Invalid token');
     }
 
     return true;

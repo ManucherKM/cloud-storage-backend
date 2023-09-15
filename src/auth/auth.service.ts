@@ -84,6 +84,12 @@ export class AuthService {
       throw new BadRequestException('Invalid user');
     }
 
+    const isVerifyHcaptcha = await this.verifyHcaptcha(loginDto.token);
+
+    if (!isVerifyHcaptcha) {
+      throw new BadRequestException('Invalid token.');
+    }
+
     const isCorrectPassword = await compare(
       loginDto.password,
       foundUser.password,
