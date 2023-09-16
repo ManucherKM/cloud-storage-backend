@@ -7,7 +7,6 @@ import { UserService } from '@/user/user.service'
 import { EVariantValidateToken, IDataToken } from './types'
 import { CreateJwtDto } from './dto/create-jwt.dto'
 import { UpdateJwtDto } from './dto/update-jwt.dto'
-import { appendFile } from 'fs'
 
 @Injectable()
 export class JwtService {
@@ -87,7 +86,7 @@ export class JwtService {
 	}
 
 	async generateAccessToken(refreshToken: string, payload: IDataToken) {
-		const isValid = await this.validateToken('refresh', refreshToken)
+		const [isValid, _] = await this.validateToken('refresh', refreshToken)
 
 		if (!isValid) {
 			throw new BadRequestException('Invalid refresh token.')
@@ -100,7 +99,7 @@ export class JwtService {
 		const foundToken = await this.jwtModel.findOne({ userId })
 
 		if (foundToken) {
-			const isValid = await this.validateToken(
+			const [isValid, _] = await this.validateToken(
 				'refresh',
 				foundToken.refreshToken,
 			)
