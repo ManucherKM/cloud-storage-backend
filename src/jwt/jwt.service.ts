@@ -21,10 +21,8 @@ export class JwtService {
 			createJwtDto.userId,
 			createJwtDto,
 		)
-		const accessToken = await this.generateAccessToken(
-			refreshToken,
-			createJwtDto,
-		)
+
+		const accessToken = this.getAccessToken(createJwtDto)
 
 		return {
 			refreshToken,
