@@ -6,6 +6,7 @@ import { ActivationModule } from './activation/activation.module'
 import { AuthModule } from './auth/auth.module'
 import { GoogleUserModule } from './google-user/google-user.module'
 
+// App
 @Module({
 	imports: [
 		ConfigModule.forRoot(),
