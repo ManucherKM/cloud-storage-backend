@@ -7,6 +7,7 @@ import { UserService } from '@/user/user.service'
 import { EVariantValidateToken, IDataToken } from './types'
 import { CreateJwtDto } from './dto/create-jwt.dto'
 import { UpdateJwtDto } from './dto/update-jwt.dto'
+import { appendFile } from 'fs'
 
 @Injectable()
 export class JwtService {
@@ -16,30 +17,63 @@ export class JwtService {
 	) {}
 
 	async create(createJwtDto: CreateJwtDto) {
-		const refreshToken = this.getRefreshToken(createJwtDto.payload)
-
-		return await this.jwtModel.create({
-			userId: createJwtDto.userId,
+		const refreshToken = await this.generateRefreshToken(
+			createJwtDto.userId,
+			createJwtDto,
+		)
+		const accessToken = await this.generateAccessToken(
 			refreshToken,
-		})
+			createJwtDto,
+		)
+
+		return {
+			refreshToken,
+			accessToken,
+		}
 	}
 
 	async update(id: Types.ObjectId, updateJwtDto: UpdateJwtDto) {
-		const { payload, ...other } = updateJwtDto
+		const refreshToken = await this.generateRefreshToken(
+			updateJwtDto.userId,
+			updateJwtDto.payload,
+		)
+		const accessToken = await this.generateAccessToken(
+			refreshToken,
+			updateJwtDto.payload,
+		)
 
-		const refreshToken = this.getRefreshToken(payload)
-
-		return await this.jwtModel.updateOne(
+		await this.jwtModel.updateOne(
 			{ _id: id },
 			{
 				refreshToken,
-				...other,
 			},
 		)
+
+		return {
+			refreshToken,
+			accessToken,
+		}
 	}
 
 	async findById(id: Types.ObjectId) {
 		return await this.jwtModel.findById({ _id: id })
+	}
+
+	async findByUserId(userId: Types.ObjectId) {
+		return await this.jwtModel.findOne({ userId })
+	}
+
+	async getNewAccessToken(refreshToken: string) {
+		const [isValid, dataToken] = await this.validateToken(
+			'refresh',
+			refreshToken,
+		)
+
+		if (!isValid) {
+			throw new BadRequestException('Invalid token.')
+		}
+
+		return this.getAccessToken(dataToken)
 	}
 
 	private getAccessToken(payload: any) {
@@ -48,14 +82,13 @@ export class JwtService {
 		})
 	}
 
-	async findByUserId(userId: Types.ObjectId) {
-		return await this.jwtModel.findOne({ userId })
+	private getRefreshToken(payload: any) {
+		return jwt.sign(payload, process.env.JWT_REFRESH_SECRET, {
+			expiresIn: 30 * 24 * 60 * 60 * 1000, // 30d
+		})
 	}
 
-	async generateAccessToken(
-		refreshToken: string,
-		payload: string | Object | Buffer,
-	) {
+	async generateAccessToken(refreshToken: string, payload: IDataToken) {
 		const isValid = await this.validateToken('refresh', refreshToken)
 
 		if (!isValid) {
@@ -65,39 +98,7 @@ export class JwtService {
 		return this.getAccessToken(payload)
 	}
 
-	private async validateToken(
-		variant: `${EVariantValidateToken}`,
-		token: string,
-	) {
-		let secret = ''
-
-		if (variant === EVariantValidateToken.access) {
-			secret = process.env.JWT_ACCESS_SECRET
-		} else if (variant === EVariantValidateToken.refresh) {
-			secret = process.env.JWT_REFRESH_SECRET
-		}
-
-		const data = jwt.verify(token, secret) as IDataToken
-
-		const foundUser = await this.userService.findById(data.userId)
-
-		if (!foundUser || !foundUser.isActivated) {
-			throw new BadRequestException('Invalid token')
-		}
-
-		return true
-	}
-
-	private getRefreshToken(payload: any) {
-		return jwt.sign(payload, process.env.JWT_REFRESH_SECRET, {
-			expiresIn: 30 * 24 * 60 * 60 * 1000, // 30d
-		})
-	}
-
-	async generateRefreshToken(
-		userId: Types.ObjectId,
-		payload: string | Object | Buffer,
-	) {
+	async generateRefreshToken(userId: Types.ObjectId, payload: IDataToken) {
 		const foundToken = await this.jwtModel.findOne({ userId })
 
 		if (foundToken) {
@@ -127,5 +128,33 @@ export class JwtService {
 		})
 
 		return refreshToken
+	}
+
+	private async validateToken(
+		variant: `${EVariantValidateToken}`,
+		token: string,
+	) {
+		let secret = ''
+
+		if (variant === EVariantValidateToken.access) {
+			secret = process.env.JWT_ACCESS_SECRET
+		} else if (variant === EVariantValidateToken.refresh) {
+			secret = process.env.JWT_REFRESH_SECRET
+		}
+
+		const data = jwt.verify(token, secret) as IDataToken
+
+		const foundUser = await this.userService.findById(data.userId)
+
+		if (!foundUser || !foundUser.isActivated) {
+			throw new BadRequestException('Invalid token')
+		}
+
+		const dataToken: IDataToken = {
+			email: foundUser.email,
+			userId: foundUser._id,
+		}
+
+		return [true, dataToken]
 	}
 }

@@ -1,9 +1,10 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common'
+import { Body, Controller, Get, Param, Patch, Req, Post } from '@nestjs/common'
 import { JwtService } from './jwt.service'
 import { ApiParam, ApiTags } from '@nestjs/swagger'
 import { Types } from 'mongoose'
 import { CreateJwtDto } from './dto/create-jwt.dto'
 import { UpdateJwtDto } from './dto/update-jwt.dto'
+import { Request } from 'express'
 
 @ApiTags('JWT')
 @Controller('jwt')
@@ -34,5 +35,14 @@ export class JwtController {
 	@Get('id/:id')
 	async findById(@Param('id') id: Types.ObjectId) {
 		return await this.jwtService.findById(id)
+	}
+
+	@Post('token')
+	async getNewAccessToken(@Req() req: Request) {
+		const refreshToken = req.cookies['refreshToken']
+
+		return await this.jwtService.getNewAccessToken(
+			'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTA1N2FhZGNkODU0ODU3NDlhMGEzYjkiLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIiwiaWF0IjoxNjk0ODU4MDE0LCJleHAiOjQyODY4NTgwMTR9._tDN9SAhSWna_xnmDXkifJCDLZ4tobqNI5chfWe2vWc',
+		)
 	}
 }

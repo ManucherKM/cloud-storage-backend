@@ -1,5 +1,5 @@
 import { Types } from 'mongoose'
-import { IsNotEmpty, IsString } from 'class-validator'
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator'
 
 import { ApiProperty } from '@nestjs/swagger'
 
@@ -11,8 +11,9 @@ export class CreateJwtDto {
 	userId: Types.ObjectId
 
 	@ApiProperty({
-		default: { email: 'test@gmail.com' },
+		default: 'test@gmail.com',
 	})
 	@IsNotEmpty()
-	payload: any
+	@IsEmail()
+	email: string
 }
