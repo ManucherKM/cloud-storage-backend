@@ -1,17 +1,27 @@
-import { IsEmail, Matches, IsString, IsNotEmpty } from 'class-validator';
+import { IsEmail, Matches, IsString, IsNotEmpty } from 'class-validator'
+import { ApiProperty } from '@nestjs/swagger'
 
 const passwordRegex = new RegExp(
-  '^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*_])(?=.{8,32}$)',
-);
+	'^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*_])(?=.{8,32}$)',
+)
 
 export class RegistrationDto {
-  @IsEmail()
-  email: string;
+	@IsEmail()
+	@ApiProperty({
+		default: 'test@gmail.com',
+	})
+	email: string
 
-  @Matches(passwordRegex)
-  password: string;
+	@Matches(passwordRegex)
+	@ApiProperty({
+		default: 'TestPassword123!?',
+	})
+	password: string
 
-  @IsString()
-  @IsNotEmpty()
-  token: string;
+	@IsNotEmpty()
+	@IsString()
+	@ApiProperty({
+		default: 'YOUR_HCAPTCHA_TOKEN',
+	})
+	token: string
 }

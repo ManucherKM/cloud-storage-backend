@@ -1,98 +1,131 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import * as jwt from 'jsonwebtoken';
-import { Jwt } from './entities/jwt.entity';
-import { Model, Types } from 'mongoose';
-import { UserService } from '@/user/user.service';
-import { EVariantValidateToken, IDataToken } from './types';
+import { Injectable, BadRequestException } from '@nestjs/common'
+import { InjectModel } from '@nestjs/mongoose'
+import * as jwt from 'jsonwebtoken'
+import { Jwt } from './entities/jwt.entity'
+import { Model, Types } from 'mongoose'
+import { UserService } from '@/user/user.service'
+import { EVariantValidateToken, IDataToken } from './types'
+import { CreateJwtDto } from './dto/create-jwt.dto'
+import { UpdateJwtDto } from './dto/update-jwt.dto'
 
 @Injectable()
 export class JwtService {
-  constructor(
-    @InjectModel(Jwt.name) private jwtModel: Model<Jwt>,
-    private readonly userService: UserService,
-  ) {}
+	constructor(
+		@InjectModel(Jwt.name) private jwtModel: Model<Jwt>,
+		private readonly userService: UserService,
+	) {}
 
-  private getAccessToken(payload: any) {
-    return jwt.sign(payload, process.env.JWT_ACCESS_SECRET, {
-      expiresIn: 30 * 60 * 60 * 1000, // 30m
-    });
-  }
+	async create(createJwtDto: CreateJwtDto) {
+		const refreshToken = this.getRefreshToken(createJwtDto.payload)
 
-  async generateAccessToken(
-    refreshToken: string,
-    payload: string | Object | Buffer,
-  ) {
-    const isValid = await this.validateToken('refresh', refreshToken);
+		return await this.jwtModel.create({
+			userId: createJwtDto.userId,
+			refreshToken,
+		})
+	}
 
-    if (!isValid) {
-      throw new BadRequestException('Invalid refresh token.');
-    }
+	async update(id: Types.ObjectId, updateJwtDto: UpdateJwtDto) {
+		const { payload, ...other } = updateJwtDto
 
-    return this.getAccessToken(payload);
-  }
+		const refreshToken = this.getRefreshToken(payload)
 
-  private async validateToken(
-    variant: `${EVariantValidateToken}`,
-    token: string,
-  ) {
-    let secret = '';
+		return await this.jwtModel.updateOne(
+			{ _id: id },
+			{
+				refreshToken,
+				...other,
+			},
+		)
+	}
 
-    if (variant === EVariantValidateToken.access) {
-      secret = process.env.JWT_ACCESS_SECRET;
-    } else if (variant === EVariantValidateToken.refresh) {
-      secret = process.env.JWT_REFRESH_SECRET;
-    }
+	async findById(id: Types.ObjectId) {
+		return await this.jwtModel.findById({ _id: id })
+	}
 
-    const data = jwt.verify(token, secret) as IDataToken;
+	private getAccessToken(payload: any) {
+		return jwt.sign(payload, process.env.JWT_ACCESS_SECRET, {
+			expiresIn: 30 * 60 * 60 * 1000, // 30m
+		})
+	}
 
-    const foundUser = await this.userService.findById(data.userId);
+	async findByUserId(userId: Types.ObjectId) {
+		return await this.jwtModel.findOne({ userId })
+	}
 
-    if (!foundUser || !foundUser.isActivated) {
-      throw new BadRequestException('Invalid token');
-    }
+	async generateAccessToken(
+		refreshToken: string,
+		payload: string | Object | Buffer,
+	) {
+		const isValid = await this.validateToken('refresh', refreshToken)
 
-    return true;
-  }
+		if (!isValid) {
+			throw new BadRequestException('Invalid refresh token.')
+		}
 
-  private getRefreshToken(payload: any) {
-    return jwt.sign(payload, process.env.JWT_REFRESH_SECRET, {
-      expiresIn: 30 * 24 * 60 * 60 * 1000, // 30d
-    });
-  }
+		return this.getAccessToken(payload)
+	}
 
-  async generateRefreshToken(
-    userId: Types.ObjectId,
-    payload: string | Object | Buffer,
-  ) {
-    const foundToken = await this.jwtModel.findOne({ userId });
+	private async validateToken(
+		variant: `${EVariantValidateToken}`,
+		token: string,
+	) {
+		let secret = ''
 
-    if (foundToken) {
-      const isValid = await this.validateToken(
-        'refresh',
-        foundToken.refreshToken,
-      );
+		if (variant === EVariantValidateToken.access) {
+			secret = process.env.JWT_ACCESS_SECRET
+		} else if (variant === EVariantValidateToken.refresh) {
+			secret = process.env.JWT_REFRESH_SECRET
+		}
 
-      if (isValid) {
-        return foundToken.refreshToken;
-      }
+		const data = jwt.verify(token, secret) as IDataToken
 
-      const token = this.getRefreshToken(payload);
+		const foundUser = await this.userService.findById(data.userId)
 
-      foundToken.refreshToken = token;
+		if (!foundUser || !foundUser.isActivated) {
+			throw new BadRequestException('Invalid token')
+		}
 
-      await foundToken.save();
+		return true
+	}
 
-      return token;
-    }
+	private getRefreshToken(payload: any) {
+		return jwt.sign(payload, process.env.JWT_REFRESH_SECRET, {
+			expiresIn: 30 * 24 * 60 * 60 * 1000, // 30d
+		})
+	}
 
-    const refreshToken = this.getRefreshToken(payload);
+	async generateRefreshToken(
+		userId: Types.ObjectId,
+		payload: string | Object | Buffer,
+	) {
+		const foundToken = await this.jwtModel.findOne({ userId })
 
-    await this.jwtModel.create({
-      refreshToken,
-      userId,
-    });
+		if (foundToken) {
+			const isValid = await this.validateToken(
+				'refresh',
+				foundToken.refreshToken,
+			)
 
-    return refreshToken;
-  }
+			if (isValid) {
+				return foundToken.refreshToken
+			}
+
+			const token = this.getRefreshToken(payload)
+
+			foundToken.refreshToken = token
+
+			await foundToken.save()
+
+			return token
+		}
+
+		const refreshToken = this.getRefreshToken(payload)
+
+		await this.jwtModel.create({
+			refreshToken,
+			userId,
+		})
+
+		return refreshToken
+	}
 }

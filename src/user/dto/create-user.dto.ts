@@ -1,17 +1,27 @@
-import { IsEmail, Matches, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, Matches, IsNotEmpty, IsString } from 'class-validator'
+import { ApiProperty } from '@nestjs/swagger'
 
 const passwordRegex = new RegExp(
-  '^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*_])(?=.{8,32}$)',
-);
+	'^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*_])(?=.{8,32}$)',
+)
 
 export class CreateUserDto {
-  @IsEmail()
-  email: string;
+	@ApiProperty({
+		default: 'test@gmail.com',
+	})
+	@IsEmail()
+	email: string
 
-  @Matches(passwordRegex)
-  password: string;
+	@ApiProperty({
+		default: 'TestPassword123!?',
+	})
+	@Matches(passwordRegex)
+	password: string
 
-  @IsString()
-  @IsNotEmpty()
-  activationKey: string;
+	@IsString()
+	@IsNotEmpty()
+	@ApiProperty({
+		default: 'YOUR_ACTIVATION_KEY',
+	})
+	activationKey: string
 }
