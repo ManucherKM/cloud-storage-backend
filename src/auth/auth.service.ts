@@ -132,7 +132,8 @@ export class AuthService {
 	}
 
 	async registrationWithGoogle({ code }: RegistrationWithGoogleDto) {
-		return await this.googleUserService.create({ code })
+		await this.googleUserService.create({ code })
+		return { success: true }
 	}
 
 	private async sendMailAccountActivation(

@@ -32,8 +32,18 @@ export class AuthController {
 	}
 
 	@Post('login/google')
-	async loginWithGoogle(@Body() loginWithGoogleDto: LoginWithGoogleDto) {
-		return await this.authService.loginWithGoogle(loginWithGoogleDto)
+	async loginWithGoogle(
+		@Body() loginWithGoogleDto: LoginWithGoogleDto,
+		@Res({ passthrough: true }) res: Response,
+	) {
+		const { accessToken, refreshToken } =
+			await this.authService.loginWithGoogle(loginWithGoogleDto)
+
+		res.cookie('refreshToken', refreshToken, {
+			httpOnly: true,
+		})
+
+		return { accessToken }
 	}
 
 	@Post('registration/google')
