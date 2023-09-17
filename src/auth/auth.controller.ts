@@ -4,6 +4,7 @@ import { RegistrationDto } from './dto/registration.dto'
 import { LoginDto } from './dto/login.dto'
 import { Response } from 'express'
 import { ApiTags } from '@nestjs/swagger'
+import { LoginWithGoogleDto } from './dto/loginWithGoogle.dto'
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -27,5 +28,10 @@ export class AuthController {
 		})
 
 		return { accessToken }
+	}
+
+	@Post('login/google')
+	async loginWithGoogle(@Body() loginWithGoogleDto: LoginWithGoogleDto) {
+		return await this.authService.loginWithGoogle(loginWithGoogleDto)
 	}
 }

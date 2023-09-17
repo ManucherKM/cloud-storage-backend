@@ -7,12 +7,14 @@ import { UserService } from '@/user/user.service'
 import { EVariantValidateToken, IDataToken } from './types'
 import { CreateJwtDto } from './dto/create-jwt.dto'
 import { UpdateJwtDto } from './dto/update-jwt.dto'
+import { GoogleUserService } from '@/google-user/google-user.service'
 
 @Injectable()
 export class JwtService {
 	constructor(
 		@InjectModel(Jwt.name) private jwtModel: Model<Jwt>,
 		private readonly userService: UserService,
+		private readonly googleUserService: GoogleUserService,
 	) {}
 
 	async create(createJwtDto: CreateJwtDto) {
@@ -139,18 +141,25 @@ export class JwtService {
 			secret = process.env.JWT_REFRESH_SECRET
 		}
 
-		const data = jwt.verify(token, secret) as IDataToken
+		const { userId } = jwt.verify(token, secret) as IDataToken
 
-		const foundUser = await this.userService.findById(data.userId)
+		const foundUser = await this.userService.findById(userId)
 
-		if (!foundUser || !foundUser.isActivated) {
+		const foundGoogleUser = await this.googleUserService.findById(userId)
+
+		const isUserExist = !!foundUser && foundUser.isActivated
+
+		const isGoogleUserExist = foundGoogleUser
+
+		const isFound = isUserExist || isGoogleUserExist
+
+		if (!isFound) {
 			throw new BadRequestException('Invalid token')
 		}
 
-		const dataToken: IDataToken = {
-			email: foundUser.email,
-			userId: foundUser._id,
-		}
+		const email = foundUser?.email || foundGoogleUser?.email
+
+		const dataToken: IDataToken = { email, userId }
 
 		return [true, dataToken]
 	}

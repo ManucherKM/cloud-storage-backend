@@ -1,17 +1,8 @@
-import {
-	Controller,
-	Get,
-	Post,
-	Body,
-	Patch,
-	Param,
-	Delete,
-} from '@nestjs/common'
+import { Controller, Post, Body, Get, Param } from '@nestjs/common'
 import { GoogleUserService } from './google-user.service'
 import { CreateGoogleUserDto } from './dto/create-google-user.dto'
-import { UpdateGoogleUserDto } from './dto/update-google-user.dto'
-
-import { ApiTags } from '@nestjs/swagger'
+import { ApiParam, ApiTags } from '@nestjs/swagger'
+import { Types } from 'mongoose'
 
 @ApiTags('Google User')
 @Controller('google-user')
@@ -19,30 +10,25 @@ export class GoogleUserController {
 	constructor(private readonly googleUserService: GoogleUserService) {}
 
 	@Post()
-	create(@Body() createGoogleUserDto: CreateGoogleUserDto) {
-		return this.googleUserService.create(createGoogleUserDto)
+	async create(@Body() createGoogleUserDto: CreateGoogleUserDto) {
+		return await this.googleUserService.create(createGoogleUserDto)
 	}
 
-	@Get()
-	findAll() {
-		return this.googleUserService.findAll()
+	@ApiParam({ name: 'id', type: String })
+	@Get('id/:id')
+	async findById(@Param('id') id: Types.ObjectId) {
+		return await this.googleUserService.findById(id)
 	}
 
-	@Get(':id')
-	findOne(@Param('id') id: string) {
-		return this.googleUserService.findOne(+id)
+	@ApiParam({ name: 'googleId', type: String })
+	@Get('googleId/:googleId')
+	async findByGoogleId(@Param('googleId') googleId: string) {
+		return await this.googleUserService.findByGoogleId(googleId)
 	}
 
-	@Patch(':id')
-	update(
-		@Param('id') id: string,
-		@Body() updateGoogleUserDto: UpdateGoogleUserDto,
-	) {
-		return this.googleUserService.update(+id, updateGoogleUserDto)
-	}
-
-	@Delete(':id')
-	remove(@Param('id') id: string) {
-		return this.googleUserService.remove(+id)
+	@ApiParam({ name: 'email', type: String })
+	@Get('email/:email')
+	async findByEmail(@Param('email') email: string) {
+		return await this.googleUserService.findByEmail(email)
 	}
 }

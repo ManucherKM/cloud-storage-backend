@@ -7,6 +7,8 @@ import { hash, compare } from 'bcrypt'
 import { v4 } from 'uuid'
 import { LoginDto } from './dto/login.dto'
 import { JwtService } from '@/jwt/jwt.service'
+import { GoogleUserService } from '@/google-user/google-user.service'
+import { LoginWithGoogleDto } from './dto/loginWithGoogle.dto'
 
 @Injectable()
 export class AuthService {
@@ -14,6 +16,7 @@ export class AuthService {
 		private readonly userService: UserService,
 		private readonly mailerService: MailerService,
 		private readonly jwtService: JwtService,
+		private readonly googleUserService: GoogleUserService,
 	) {}
 
 	async registration(registrationDto: RegistrationDto) {
@@ -53,34 +56,10 @@ export class AuthService {
 		return { success: true }
 	}
 
-	private async sendMailAccountActivation(
-		email: string,
-		activationKey: string,
-	) {
-		const activationLink = process.env.API_URL + '/activation/' + activationKey
-		await this.mailerService.sendMail({
-			to: email,
-			from: process.env.NODEMAILER_USER,
-			subject: 'Cloud-Storage Account Confirmation.',
-			html: `<a href="${activationLink}">Click on the link.</a>`,
-		})
-	}
-
-	private async getPasswordHash(password: string) {
-		const salt = 10
-		const passwordHash = await hash(password, salt)
-		return passwordHash
-	}
-
-	private async verifyHcaptcha(token: string) {
-		const { success } = await verify(process.env.HCAPTCHA_SECRET_KEY, token)
-		return success
-	}
-
 	async login(loginDto: LoginDto) {
 		const foundUser = await this.userService.findByEmail(loginDto.email)
 
-		if (foundUser && !foundUser.isActivated) {
+		if (!foundUser || !foundUser.isActivated) {
 			throw new BadRequestException('Invalid user')
 		}
 
@@ -120,5 +99,58 @@ export class AuthService {
 			refreshToken,
 			accessToken,
 		}
+	}
+
+	async loginWithGoogle({ code }: LoginWithGoogleDto) {
+		const { email } = await this.googleUserService.getUserInfoByCode(code)
+
+		const foundUser = await this.googleUserService.findByEmail(email)
+
+		if (!foundUser) {
+			throw new BadRequestException('Invalid user')
+		}
+
+		const userId = foundUser._id
+
+		const payload = { userId, email }
+
+		const refreshToken = await this.jwtService.generateRefreshToken(
+			userId,
+			payload,
+		)
+
+		const accessToken = await this.jwtService.generateAccessToken(
+			refreshToken,
+			payload,
+		)
+
+		return {
+			refreshToken,
+			accessToken,
+		}
+	}
+
+	private async sendMailAccountActivation(
+		email: string,
+		activationKey: string,
+	) {
+		const activationLink = process.env.API_URL + '/activation/' + activationKey
+		await this.mailerService.sendMail({
+			to: email,
+			from: process.env.NODEMAILER_USER,
+			subject: 'Cloud-Storage Account Confirmation.',
+			html: `<a href="${activationLink}">Click on the link.</a>`,
+		})
+	}
+
+	private async getPasswordHash(password: string) {
+		const salt = 10
+		const passwordHash = await hash(password, salt)
+		return passwordHash
+	}
+
+	private async verifyHcaptcha(token: string) {
+		const { success } = await verify(process.env.HCAPTCHA_SECRET_KEY, token)
+		return success
 	}
 }

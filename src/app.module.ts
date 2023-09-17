@@ -4,7 +4,6 @@ import { MongooseModule } from '@nestjs/mongoose'
 import { MailerModule } from '@nestjs-modules/mailer'
 import { ActivationModule } from './activation/activation.module'
 import { AuthModule } from './auth/auth.module'
-import { GoogleUserModule } from './google-user/google-user.module'
 
 // App
 @Module({
@@ -22,7 +21,6 @@ import { GoogleUserModule } from './google-user/google-user.module'
 		}),
 		AuthModule,
 		ActivationModule,
-		GoogleUserModule,
 	],
 })
 export class AppModule {}
