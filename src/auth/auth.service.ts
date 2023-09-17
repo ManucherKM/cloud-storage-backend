@@ -9,6 +9,7 @@ import { LoginDto } from './dto/login.dto'
 import { JwtService } from '@/jwt/jwt.service'
 import { GoogleUserService } from '@/google-user/google-user.service'
 import { LoginWithGoogleDto } from './dto/loginWithGoogle.dto'
+import { RegistrationWithGoogleDto } from './dto/registrationWithGoogle.dto'
 
 @Injectable()
 export class AuthService {
@@ -45,7 +46,7 @@ export class AuthService {
 
 		const activationKey = v4()
 
-		await this.userService.create({
+		const user = await this.userService.create({
 			email: registrationDto.email,
 			password: passwordHash,
 			activationKey,
@@ -53,7 +54,7 @@ export class AuthService {
 
 		await this.sendMailAccountActivation(registrationDto.email, activationKey)
 
-		return { success: true }
+		return user
 	}
 
 	async login(loginDto: LoginDto) {
@@ -128,6 +129,10 @@ export class AuthService {
 			refreshToken,
 			accessToken,
 		}
+	}
+
+	async registrationWithGoogle({ code }: RegistrationWithGoogleDto) {
+		return await this.googleUserService.create({ code })
 	}
 
 	private async sendMailAccountActivation(

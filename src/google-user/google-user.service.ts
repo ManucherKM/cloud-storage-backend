@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
+
 import { CreateGoogleUserDto } from './dto/create-google-user.dto'
 import { InjectModel } from '@nestjs/mongoose'
 import { GoogleUser } from './entities/google-user.entity'
@@ -21,6 +22,13 @@ export class GoogleUserService {
 
 	async create({ code }: CreateGoogleUserDto) {
 		const user: IGoogleUser = await this.getUserInfoByCode(code)
+
+		const foundUser = await this.findByEmail(user.email)
+
+		if (foundUser) {
+			throw new BadRequestException('Failed to create user')
+		}
+
 		return await this.googleUserModel.create(user)
 	}
 
