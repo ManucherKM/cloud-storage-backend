@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsNotEmpty, IsString, IsUrl } from 'class-validator'
+import { IsNotEmpty, IsString } from 'class-validator'
 
 export class RegistrationWithVKDto {
 	@ApiProperty({
@@ -12,6 +12,8 @@ export class RegistrationWithVKDto {
 	@ApiProperty({
 		default: 'YOUR_REDIRECT_URI',
 	})
-	@IsUrl()
+	// @IsUrl()
+	@IsString()
+	@IsNotEmpty()
 	redirectUri: string
 }

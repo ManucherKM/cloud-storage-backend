@@ -151,7 +151,16 @@ export class AuthService {
 	async registrationWithGoogle({ code }: RegistrationWithGoogleDto) {
 		const userInfo = await this.googleUserService.getUserInfoByCode(code)
 
-		await this.googleUserService.create(userInfo)
+		await this.googleUserService.create({
+			email: userInfo.email,
+			familyName: userInfo.family_name,
+			givenName: userInfo.given_name,
+			googleId: userInfo.id,
+			locale: userInfo.locale,
+			name: userInfo.name,
+			picture: userInfo.picture,
+			verifiedEmail: userInfo.verified_email,
+		})
 
 		return { success: true }
 	}
@@ -218,7 +227,7 @@ export class AuthService {
 		activationKey: string,
 	) {
 		const activationLink =
-			process.env.API_URL + 'api/activation/' + activationKey
+			process.env.API_URL + '/api/activation/' + activationKey
 		await this.mailerService.sendMail({
 			to: email,
 			from: process.env.NODEMAILER_USER,

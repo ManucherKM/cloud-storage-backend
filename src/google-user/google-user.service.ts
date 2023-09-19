@@ -4,7 +4,6 @@ import { google } from 'googleapis'
 import { Model } from 'mongoose'
 import { CreateGoogleUserDto } from './dto/create-google-user.dto'
 import { GoogleUser } from './entities/google-user.entity'
-import { IGoogleUser } from './types'
 
 @Injectable()
 export class GoogleUserService {
@@ -40,12 +39,7 @@ export class GoogleUserService {
 
 		const { data } = await oauth2.userinfo.get()
 
-		const { id, ...other } = data
-
-		return {
-			googleId: id,
-			...other,
-		} as IGoogleUser
+		return data
 	}
 
 	async findById(id: string) {
