@@ -11,6 +11,7 @@ import { Response } from 'express'
 import { AuthService } from './auth.service'
 import { LoginDto } from './dto/login.dto'
 import { LoginWithGoogleDto } from './dto/loginWithGoogle.dto'
+import { LoginWithVkDto } from './dto/loginWithVk.dto'
 import { RegistrationDto } from './dto/registration.dto'
 import { RegistrationWithGoogleDto } from './dto/registrationWithGoogle.dto'
 import { RegistrationWithVKDto } from './dto/registrationWithVK.dto'
@@ -72,6 +73,24 @@ export class AuthController {
 			return await this.authService.registrationWithGoogle(
 				registrationWithGoogleDto,
 			)
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
+	}
+
+	@Post('login/vk')
+	async loginWithVk(
+		@Body() loginWithGoogleDto: LoginWithVkDto,
+		@Res({ passthrough: true }) res: Response,
+	) {
+		try {
+			const { accessToken, refreshToken } = await this.authService.loginWithVk(
+				loginWithGoogleDto,
+			)
+
+			res.cookie('refreshToken', refreshToken, { httpOnly: true })
+
+			return { accessToken }
 		} catch (e) {
 			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
 		}

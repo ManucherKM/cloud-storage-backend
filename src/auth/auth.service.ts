@@ -11,6 +11,7 @@ import { verify } from 'hcaptcha'
 import { v4 } from 'uuid'
 import { LoginDto } from './dto/login.dto'
 import { LoginWithGoogleDto } from './dto/loginWithGoogle.dto'
+import { LoginWithVkDto } from './dto/loginWithVk.dto'
 import { RegistrationDto } from './dto/registration.dto'
 import { RegistrationWithGoogleDto } from './dto/registrationWithGoogle.dto'
 import { RegistrationWithVKDto } from './dto/registrationWithVK.dto'
@@ -67,7 +68,7 @@ export class AuthService {
 		const foundUser = await this.userService.findByEmail(loginDto.email)
 
 		if (!foundUser || !foundUser.isActivated) {
-			throw new BadRequestException('This user already exists.')
+			throw new BadRequestException('Incorrect login or password.')
 		}
 
 		const isVerifyHcaptcha = await this.verifyHcaptcha(loginDto.token)
@@ -105,7 +106,32 @@ export class AuthService {
 		const foundUser = await this.googleUserService.findByEmail(email)
 
 		if (!foundUser) {
-			throw new BadRequestException('This user already exists.')
+			throw new BadRequestException('User is not found.')
+		}
+
+		const userId = foundUser._id.toString()
+
+		const payload = { userId }
+
+		const refreshToken = await this.jwtService.generateRefreshToken(payload)
+
+		const accessToken = this.jwtService.getAccessToken(payload)
+
+		return {
+			refreshToken,
+			accessToken,
+		}
+	}
+
+	async loginWithVk({ code, redirectUri }: LoginWithVkDto) {
+		const vkAccessToken = await this.getVKAccessToken(code, redirectUri)
+
+		const userInfo = await this.getVKUserInfo(vkAccessToken)
+
+		const foundUser = await this.vkUserService.findByVkId(userInfo.id)
+
+		if (!foundUser) {
+			throw new BadRequestException('User is not found.')
 		}
 
 		const userId = foundUser._id.toString()
@@ -161,7 +187,7 @@ export class AuthService {
 		const userInfo = data.response[0]
 
 		if (!userInfo.id) {
-			throw new BadRequestException('Invalid access_token.')
+			throw new BadRequestException('Invalid access token.')
 		}
 
 		return userInfo
