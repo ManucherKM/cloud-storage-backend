@@ -1,4 +1,11 @@
-import { Body, Controller, Post, Res } from '@nestjs/common'
+import {
+	Body,
+	Controller,
+	HttpException,
+	HttpStatus,
+	Post,
+	Res,
+} from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { Response } from 'express'
 import { AuthService } from './auth.service'
@@ -15,7 +22,11 @@ export class AuthController {
 
 	@Post('registration')
 	async registration(@Body() registrationDto: RegistrationDto) {
-		return await this.authService.registration(registrationDto)
+		try {
+			return await this.authService.registration(registrationDto)
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
 	}
 
 	@Post('login')
@@ -23,13 +34,17 @@ export class AuthController {
 		@Body() loginDto: LoginDto,
 		@Res({ passthrough: true }) res: Response,
 	) {
-		const { accessToken, refreshToken } = await this.authService.login(loginDto)
+		try {
+			const { accessToken, refreshToken } = await this.authService.login(
+				loginDto,
+			)
 
-		res.cookie('refreshToken', refreshToken, {
-			httpOnly: true,
-		})
+			res.cookie('refreshToken', refreshToken, { httpOnly: true })
 
-		return { accessToken }
+			return { accessToken }
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
 	}
 
 	@Post('login/google')
@@ -37,31 +52,39 @@ export class AuthController {
 		@Body() loginWithGoogleDto: LoginWithGoogleDto,
 		@Res({ passthrough: true }) res: Response,
 	) {
-		const { accessToken, refreshToken } =
-			await this.authService.loginWithGoogle(loginWithGoogleDto)
+		try {
+			const { accessToken, refreshToken } =
+				await this.authService.loginWithGoogle(loginWithGoogleDto)
 
-		res.cookie('refreshToken', refreshToken, {
-			httpOnly: true,
-		})
+			res.cookie('refreshToken', refreshToken, { httpOnly: true })
 
-		return { accessToken }
+			return { accessToken }
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
 	}
 
 	@Post('registration/google')
 	async registrationWithGoogle(
 		@Body() registrationWithGoogleDto: RegistrationWithGoogleDto,
 	) {
-		return await this.authService.registrationWithGoogle(
-			registrationWithGoogleDto,
-		)
+		try {
+			return await this.authService.registrationWithGoogle(
+				registrationWithGoogleDto,
+			)
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
 	}
 
 	@Post('registration/vk')
 	async registrationWithVK(
 		@Body() registrationWithVKDto: RegistrationWithVKDto,
 	) {
-		console.log(registrationWithVKDto)
-
-		return await this.authService.registrationWithVK(registrationWithVKDto)
+		try {
+			return await this.authService.registrationWithVK(registrationWithVKDto)
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
 	}
 }

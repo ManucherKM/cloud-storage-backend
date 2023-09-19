@@ -6,22 +6,22 @@ const passwordRegex = new RegExp(
 )
 
 export class RegistrationDto {
-	@IsEmail()
 	@ApiProperty({
 		default: 'test@gmail.com',
 	})
+	@IsEmail()
 	email: string
 
-	@Matches(passwordRegex)
 	@ApiProperty({
 		default: 'TestPassword123!?',
 	})
+	@Matches(passwordRegex)
 	password: string
 
-	@IsNotEmpty()
-	@IsString()
 	@ApiProperty({
 		default: 'YOUR_HCAPTCHA_TOKEN',
 	})
+	@IsNotEmpty()
+	@IsString()
 	token: string
 }

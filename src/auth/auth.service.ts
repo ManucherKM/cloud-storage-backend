@@ -30,7 +30,7 @@ export class AuthService {
 		const foundUser = await this.userService.findByEmail(registrationDto.email)
 
 		if (foundUser && foundUser.isActivated) {
-			throw new BadRequestException('Incorrect login or password.')
+			throw new BadRequestException('This user already exists.')
 		}
 
 		if (foundUser && !foundUser.isActivated) {
@@ -67,7 +67,7 @@ export class AuthService {
 		const foundUser = await this.userService.findByEmail(loginDto.email)
 
 		if (!foundUser || !foundUser.isActivated) {
-			throw new BadRequestException('Invalid user')
+			throw new BadRequestException('This user already exists.')
 		}
 
 		const isVerifyHcaptcha = await this.verifyHcaptcha(loginDto.token)
@@ -85,19 +85,13 @@ export class AuthService {
 			throw new BadRequestException('Incorrect login or password.')
 		}
 
-		const userId = foundUser._id
+		const userId = foundUser._id.toString()
 
-		const payload = {
-			userId,
-			email: loginDto.email,
-		}
+		const payload = { userId }
 
 		const refreshToken = await this.jwtService.generateRefreshToken(payload)
 
-		const accessToken = await this.jwtService.generateAccessToken(
-			refreshToken,
-			payload,
-		)
+		const accessToken = this.jwtService.getAccessToken(payload)
 
 		return {
 			refreshToken,
@@ -111,19 +105,16 @@ export class AuthService {
 		const foundUser = await this.googleUserService.findByEmail(email)
 
 		if (!foundUser) {
-			throw new BadRequestException('Invalid user')
+			throw new BadRequestException('This user already exists.')
 		}
 
-		const userId = foundUser._id
+		const userId = foundUser._id.toString()
 
-		const payload = { userId, email }
+		const payload = { userId }
 
 		const refreshToken = await this.jwtService.generateRefreshToken(payload)
 
-		const accessToken = await this.jwtService.generateAccessToken(
-			refreshToken,
-			payload,
-		)
+		const accessToken = this.jwtService.getAccessToken(payload)
 
 		return {
 			refreshToken,
@@ -140,24 +131,19 @@ export class AuthService {
 	}
 
 	async registrationWithVK({ code, redirectUri }: RegistrationWithVKDto) {
-		try {
-			const accessToken = await this.getVKAccessToken(code, redirectUri)
+		const accessToken = await this.getVKAccessToken(code, redirectUri)
 
-			const { id, bdate, first_name, last_name, photo_400_orig } =
-				await this.getVKUserInfo(accessToken)
+		const userInfo = await this.getVKUserInfo(accessToken)
 
-			await this.vkUserService.create({
-				vkId: id,
-				bdate,
-				firstName: first_name,
-				lastName: last_name,
-				photo400Orig: photo_400_orig,
-			})
+		await this.vkUserService.create({
+			vkId: userInfo.id,
+			bdate: userInfo.bdate,
+			firstName: userInfo.first_name,
+			lastName: userInfo.last_name,
+			photo400Orig: userInfo.photo_400_orig,
+		})
 
-			return { success: true }
-		} catch (e) {
-			console.error(e.message)
-		}
+		return { success: true }
 	}
 
 	private async getVKUserInfo(access_token: string) {
@@ -205,7 +191,8 @@ export class AuthService {
 		email: string,
 		activationKey: string,
 	) {
-		const activationLink = process.env.API_URL + '/activation/' + activationKey
+		const activationLink =
+			process.env.API_URL + 'api/activation/' + activationKey
 		await this.mailerService.sendMail({
 			to: email,
 			from: process.env.NODEMAILER_USER,

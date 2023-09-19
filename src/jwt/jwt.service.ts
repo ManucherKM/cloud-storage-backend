@@ -33,10 +33,7 @@ export class JwtService {
 	async update(id: Types.ObjectId, updateJwtDto: UpdateJwtDto) {
 		const refreshToken = await this.generateRefreshToken(updateJwtDto)
 
-		const accessToken = await this.generateAccessToken(
-			refreshToken,
-			updateJwtDto,
-		)
+		const accessToken = this.getAccessToken(updateJwtDto)
 
 		await this.jwtModel.updateOne(
 			{ _id: id },
@@ -72,26 +69,16 @@ export class JwtService {
 		return this.getAccessToken(dataToken)
 	}
 
-	private getAccessToken(payload: any) {
+	getAccessToken(payload: IDataToken) {
 		return jwt.sign(payload, process.env.JWT_ACCESS_SECRET, {
 			expiresIn: 30 * 60 * 60 * 1000, // 30m
 		})
 	}
 
-	private getRefreshToken(payload: any) {
+	private getRefreshToken(payload: IDataToken) {
 		return jwt.sign(payload, process.env.JWT_REFRESH_SECRET, {
 			expiresIn: 30 * 24 * 60 * 60 * 1000, // 30d
 		})
-	}
-
-	async generateAccessToken(refreshToken: string, payload: IDataToken) {
-		const [isValid, _] = await this.validateToken('refresh', refreshToken)
-
-		if (!isValid) {
-			throw new BadRequestException('Invalid refresh token.')
-		}
-
-		return this.getAccessToken(payload)
 	}
 
 	async generateRefreshToken(payload: IDataToken) {
@@ -160,6 +147,6 @@ export class JwtService {
 
 		const dataToken: IDataToken = { userId }
 
-		return [true, dataToken]
+		return [true, dataToken] as [boolean, IDataToken]
 	}
 }
