@@ -1,13 +1,14 @@
-import { Injectable, BadRequestException } from '@nestjs/common'
+import { GoogleUserService } from '@/google-user/google-user.service'
+import { UserService } from '@/user/user.service'
+import { VkUserService } from '@/vk-user/vk-user.service'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import * as jwt from 'jsonwebtoken'
-import { Jwt } from './entities/jwt.entity'
 import { Model, Types } from 'mongoose'
-import { UserService } from '@/user/user.service'
-import { EVariantValidateToken, IDataToken } from './types'
 import { CreateJwtDto } from './dto/create-jwt.dto'
 import { UpdateJwtDto } from './dto/update-jwt.dto'
-import { GoogleUserService } from '@/google-user/google-user.service'
+import { Jwt } from './entities/jwt.entity'
+import { EVariantValidateToken, IDataToken } from './types'
 
 @Injectable()
 export class JwtService {
@@ -15,13 +16,11 @@ export class JwtService {
 		@InjectModel(Jwt.name) private jwtModel: Model<Jwt>,
 		private readonly userService: UserService,
 		private readonly googleUserService: GoogleUserService,
+		private readonly vkUserService: VkUserService,
 	) {}
 
 	async create(createJwtDto: CreateJwtDto) {
-		const refreshToken = await this.generateRefreshToken(
-			createJwtDto.userId,
-			createJwtDto,
-		)
+		const refreshToken = await this.generateRefreshToken(createJwtDto)
 
 		const accessToken = this.getAccessToken(createJwtDto)
 
@@ -32,13 +31,11 @@ export class JwtService {
 	}
 
 	async update(id: Types.ObjectId, updateJwtDto: UpdateJwtDto) {
-		const refreshToken = await this.generateRefreshToken(
-			updateJwtDto.userId,
-			updateJwtDto.payload,
-		)
+		const refreshToken = await this.generateRefreshToken(updateJwtDto)
+
 		const accessToken = await this.generateAccessToken(
 			refreshToken,
-			updateJwtDto.payload,
+			updateJwtDto,
 		)
 
 		await this.jwtModel.updateOne(
@@ -97,8 +94,8 @@ export class JwtService {
 		return this.getAccessToken(payload)
 	}
 
-	async generateRefreshToken(userId: Types.ObjectId, payload: IDataToken) {
-		const foundToken = await this.jwtModel.findOne({ userId })
+	async generateRefreshToken(payload: IDataToken) {
+		const foundToken = await this.jwtModel.findOne({ userId: payload.userId })
 
 		if (foundToken) {
 			const [isValid, _] = await this.validateToken(
@@ -123,7 +120,7 @@ export class JwtService {
 
 		await this.jwtModel.create({
 			refreshToken,
-			userId,
+			userId: payload.userId,
 		})
 
 		return refreshToken
@@ -147,19 +144,21 @@ export class JwtService {
 
 		const foundGoogleUser = await this.googleUserService.findById(userId)
 
+		const foundVkUser = await this.vkUserService.findById(userId)
+
 		const isUserExist = !!foundUser && foundUser.isActivated
 
 		const isGoogleUserExist = foundGoogleUser
 
-		const isFound = isUserExist || isGoogleUserExist
+		const isVkUserExist = foundVkUser
+
+		const isFound = isUserExist || isGoogleUserExist || isVkUserExist
 
 		if (!isFound) {
 			throw new BadRequestException('Invalid token')
 		}
 
-		const email = foundUser?.email || foundGoogleUser?.email
-
-		const dataToken: IDataToken = { email, userId }
+		const dataToken: IDataToken = { userId }
 
 		return [true, dataToken]
 	}

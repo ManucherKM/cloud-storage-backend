@@ -1,7 +1,13 @@
-import { Controller, Get, Param, Res } from '@nestjs/common'
-import { ActivationService } from './activation.service'
-
+import {
+	Controller,
+	Get,
+	HttpException,
+	HttpStatus,
+	Param,
+	Res,
+} from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
+import { ActivationService } from './activation.service'
 
 @ApiTags('Activation')
 @Controller('activation')
@@ -10,7 +16,12 @@ export class ActivationController {
 
 	@Get(':key')
 	async activationAccount(@Param('key') key: string, @Res() res) {
-		await this.activationService.activationAccount(key)
-		res.status(302).redirect(process.env.CLIENT_URL)
+		try {
+			await this.activationService.activationAccount(key)
+			res.status(302).redirect(process.env.CLIENT_URL)
+			return { success: true }
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
 	}
 }

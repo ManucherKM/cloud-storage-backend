@@ -1,19 +1,18 @@
 import { PartialType } from '@nestjs/mapped-types'
-import { CreateJwtDto } from './create-jwt.dto'
-import { Types } from 'mongoose'
-import { IsNotEmpty, IsString } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
+import { IsEmail, IsString } from 'class-validator'
+import { CreateJwtDto } from './create-jwt.dto'
 
 export class UpdateJwtDto extends PartialType(CreateJwtDto) {
 	@ApiProperty({
 		default: 'USER_ID',
 	})
 	@IsString()
-	userId?: Types.ObjectId
+	userId: string
 
 	@ApiProperty({
-		default: { email: 'test@gmail.com' },
+		default: 'test@gmail.com',
 	})
-	@IsNotEmpty()
-	payload?: any
+	@IsEmail()
+	email: string
 }

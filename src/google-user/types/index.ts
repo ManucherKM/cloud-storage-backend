@@ -1,10 +1,10 @@
 export interface IGoogleUser {
 	googleId: string
 	email: string
-	verified_email: boolean
+	verifiedEmail: boolean
 	name: string
-	given_name: string
-	family_name: string
+	givenName: string
+	familyName: string
 	picture: string
 	locale: string
 }

@@ -1,5 +1,5 @@
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { HydratedDocument } from 'mongoose'
-import { Schema, SchemaFactory, Prop } from '@nestjs/mongoose'
 
 export type GoogleUserDocument = HydratedDocument<GoogleUser>
 
@@ -14,16 +14,16 @@ export class GoogleUser {
 	email: string
 
 	@Prop({ required: true })
-	verified_email: boolean
+	verifiedEmail: boolean
 
 	@Prop({ required: true })
 	name: string
 
 	@Prop({ required: true })
-	given_name: string
+	givenName: string
 
 	@Prop({ required: true })
-	family_name: string
+	familyName: string
 
 	@Prop({ required: true })
 	picture: string

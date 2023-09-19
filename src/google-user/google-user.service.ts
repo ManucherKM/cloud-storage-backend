@@ -1,17 +1,16 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
-
-import { CreateGoogleUserDto } from './dto/create-google-user.dto'
 import { InjectModel } from '@nestjs/mongoose'
-import { GoogleUser } from './entities/google-user.entity'
-import { Model, Types } from 'mongoose'
 import { google } from 'googleapis'
+import { Model } from 'mongoose'
+import { CreateGoogleUserDto } from './dto/create-google-user.dto'
+import { GoogleUser } from './entities/google-user.entity'
 import { IGoogleUser } from './types'
 
 @Injectable()
 export class GoogleUserService {
 	private readonly Oauth2Client = new google.auth.OAuth2(
 		process.env.GOOGLE_CLIENT_ID,
-		process.env.GOOGLE_CLIENT_SECRET,
+		process.env.GOOGLE_SECRET,
 		process.env.CLIENT_URL,
 	)
 
@@ -20,16 +19,14 @@ export class GoogleUserService {
 		private readonly googleUserModel: Model<GoogleUser>,
 	) {}
 
-	async create({ code }: CreateGoogleUserDto) {
-		const user: IGoogleUser = await this.getUserInfoByCode(code)
-
-		const foundUser = await this.findByEmail(user.email)
+	async create(createGoogleUserDto: CreateGoogleUserDto) {
+		const foundUser = await this.findByEmail(createGoogleUserDto.email)
 
 		if (foundUser) {
 			throw new BadRequestException('Failed to create user')
 		}
 
-		return await this.googleUserModel.create(user)
+		return await this.googleUserModel.create(createGoogleUserDto)
 	}
 
 	async getUserInfoByCode(code: string) {
@@ -51,7 +48,7 @@ export class GoogleUserService {
 		} as IGoogleUser
 	}
 
-	async findById(id: Types.ObjectId) {
+	async findById(id: string) {
 		return await this.googleUserModel.findById({ _id: id })
 	}
 
@@ -61,5 +58,13 @@ export class GoogleUserService {
 
 	async findByGoogleId(googleId: string) {
 		return await this.googleUserModel.findOne({ googleId })
+	}
+
+	async findAll() {
+		return await this.googleUserModel.find()
+	}
+
+	async remove(id: string) {
+		return await this.googleUserModel.deleteOne({ _id: id })
 	}
 }

@@ -9,5 +9,6 @@
   "bracketSpacing": true,
   "arrowParens": "avoid",
   "proseWrap": "always",
-  "endOfLine": "lf"
+  "endOfLine": "lf",
+  "organizeImportsSkipDestructiveCodeActions": false
 }

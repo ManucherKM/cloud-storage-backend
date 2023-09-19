@@ -1,10 +1,18 @@
-import { Controller, Get, Param, Body, Post, Patch } from '@nestjs/common'
-import { UserService } from './user.service'
-
-import { ApiTags, ApiParam } from '@nestjs/swagger'
-import { Types } from 'mongoose'
+import {
+	Body,
+	Controller,
+	Delete,
+	Get,
+	HttpException,
+	HttpStatus,
+	Param,
+	Patch,
+	Post,
+} from '@nestjs/common'
+import { ApiParam, ApiTags } from '@nestjs/swagger'
 import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
+import { UserService } from './user.service'
 
 @ApiTags('User')
 @Controller('user')
@@ -13,30 +21,65 @@ export class UserController {
 
 	@Post()
 	async create(@Body() createUserDto: CreateUserDto) {
-		return await this.userService.create(createUserDto)
+		try {
+			return await this.userService.create(createUserDto)
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
 	}
 
-	@Patch(':id')
 	@ApiParam({ name: 'id', type: String })
-	update(
-		@Param('id') id: Types.ObjectId,
-		@Body() updateUserDto: UpdateUserDto,
-	) {
-		return this.userService.update(id, updateUserDto)
+	@Patch(':id')
+	update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+		try {
+			return this.userService.update(id, updateUserDto)
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
 	}
 
 	@Get('email/:email')
 	async findByEmail(@Param('email') email: string) {
-		return await this.userService.findByEmail(email)
+		try {
+			return await this.userService.findByEmail(email)
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
 	}
 
 	@Get('id/:id')
-	async findById(@Param('id') id: Types.ObjectId) {
-		return await this.userService.findById(id)
+	async findById(@Param('id') id: string) {
+		try {
+			return await this.userService.findById(id)
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
 	}
 
-	@Get('key/:activationKey')
+	@Get('activationKey/:activationKey')
 	async findByActivationKey(@Param('activationKey') activationKey: string) {
-		return await this.userService.findByActivationKey(activationKey)
+		try {
+			return await this.userService.findByActivationKey(activationKey)
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
+	}
+
+	@Get('all')
+	async findAll() {
+		try {
+			return await this.userService.findAll()
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
+	}
+
+	@Delete(':id')
+	async remove(@Param('id') id: string) {
+		try {
+			return await this.userService.remove(id)
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
 	}
 }

@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common'
-import { GoogleUserService } from './google-user.service'
-import { GoogleUserController } from './google-user.controller'
-import { GoogleUser, GoogleUserSchema } from './entities/google-user.entity'
 import { MongooseModule } from '@nestjs/mongoose'
+import { GoogleUser, GoogleUserSchema } from './entities/google-user.entity'
+import { GoogleUserController } from './google-user.controller'
+import { GoogleUserService } from './google-user.service'
 
 @Module({
 	imports: [

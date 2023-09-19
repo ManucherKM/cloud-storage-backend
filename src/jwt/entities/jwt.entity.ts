@@ -1,5 +1,5 @@
-import { HydratedDocument, SchemaTypes, Types } from 'mongoose'
-import { Schema, SchemaFactory, Prop } from '@nestjs/mongoose'
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
+import { HydratedDocument, Types } from 'mongoose'
 
 export type JwtDocument = HydratedDocument<Jwt>
 
@@ -8,8 +8,8 @@ export type JwtDocument = HydratedDocument<Jwt>
 })
 export class Jwt {
 	@Prop({
-		type: SchemaTypes.ObjectId,
-		ref: 'User',
+		// type: SchemaTypes.ObjectId,
+		// ref: 'User',
 		required: true,
 		unique: true,
 	})

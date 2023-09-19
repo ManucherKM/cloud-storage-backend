@@ -1,10 +1,20 @@
-import { Body, Controller, Get, Param, Patch, Req, Post } from '@nestjs/common'
-import { JwtService } from './jwt.service'
+import {
+	Body,
+	Controller,
+	Get,
+	HttpException,
+	HttpStatus,
+	Param,
+	Patch,
+	Post,
+	Req,
+} from '@nestjs/common'
 import { ApiParam, ApiTags } from '@nestjs/swagger'
+import { Request } from 'express'
 import { Types } from 'mongoose'
 import { CreateJwtDto } from './dto/create-jwt.dto'
 import { UpdateJwtDto } from './dto/update-jwt.dto'
-import { Request } from 'express'
+import { JwtService } from './jwt.service'
 
 @ApiTags('JWT')
 @Controller('jwt')
@@ -13,7 +23,11 @@ export class JwtController {
 
 	@Post()
 	async create(@Body() createJwtDto: CreateJwtDto) {
-		return await this.jwtService.create(createJwtDto)
+		try {
+			return await this.jwtService.create(createJwtDto)
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
 	}
 
 	@Patch(':id')
@@ -22,27 +36,40 @@ export class JwtController {
 		@Param('id') id: Types.ObjectId,
 		@Body() updateJwtDto: UpdateJwtDto,
 	) {
-		return this.jwtService.update(id, updateJwtDto)
+		try {
+			return this.jwtService.update(id, updateJwtDto)
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
 	}
 
 	@ApiParam({ name: 'userId', type: String })
 	@Get('userId/:userId')
 	async findByUserId(@Param('userId') userId: Types.ObjectId) {
-		return await this.jwtService.findByUserId(userId)
+		try {
+			return await this.jwtService.findByUserId(userId)
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
 	}
 
 	@ApiParam({ name: 'id', type: String })
 	@Get('id/:id')
 	async findById(@Param('id') id: Types.ObjectId) {
-		return await this.jwtService.findById(id)
+		try {
+			return await this.jwtService.findById(id)
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
 	}
 
 	@Post('token')
 	async getNewAccessToken(@Req() req: Request) {
-		const refreshToken = req.cookies['refreshToken']
-
-		return await this.jwtService.getNewAccessToken(
-			'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTA1N2FhZGNkODU0ODU3NDlhMGEzYjkiLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIiwiaWF0IjoxNjk0ODU4MDE0LCJleHAiOjQyODY4NTgwMTR9._tDN9SAhSWna_xnmDXkifJCDLZ4tobqNI5chfWe2vWc',
-		)
+		try {
+			const refreshToken = req.cookies['refreshToken']
+			return await this.jwtService.getNewAccessToken(refreshToken)
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
 	}
 }

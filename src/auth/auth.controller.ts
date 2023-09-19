@@ -1,11 +1,12 @@
-import { Controller, Post, Body, Res } from '@nestjs/common'
-import { AuthService } from './auth.service'
-import { RegistrationDto } from './dto/registration.dto'
-import { LoginDto } from './dto/login.dto'
-import { Response } from 'express'
+import { Body, Controller, Post, Res } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
+import { Response } from 'express'
+import { AuthService } from './auth.service'
+import { LoginDto } from './dto/login.dto'
 import { LoginWithGoogleDto } from './dto/loginWithGoogle.dto'
+import { RegistrationDto } from './dto/registration.dto'
 import { RegistrationWithGoogleDto } from './dto/registrationWithGoogle.dto'
+import { RegistrationWithVKDto } from './dto/registrationWithVK.dto'
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -53,5 +54,14 @@ export class AuthController {
 		return await this.authService.registrationWithGoogle(
 			registrationWithGoogleDto,
 		)
+	}
+
+	@Post('registration/vk')
+	async registrationWithVK(
+		@Body() registrationWithVKDto: RegistrationWithVKDto,
+	) {
+		console.log(registrationWithVKDto)
+
+		return await this.authService.registrationWithVK(registrationWithVKDto)
 	}
 }
