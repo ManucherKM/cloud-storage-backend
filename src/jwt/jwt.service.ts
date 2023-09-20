@@ -4,7 +4,7 @@ import { VkUserService } from '@/vk-user/vk-user.service'
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import * as jwt from 'jsonwebtoken'
-import { Model, Types } from 'mongoose'
+import { Model } from 'mongoose'
 import { CreateJwtDto } from './dto/create-jwt.dto'
 import { UpdateJwtDto } from './dto/update-jwt.dto'
 import { Jwt } from './entities/jwt.entity'
@@ -30,7 +30,7 @@ export class JwtService {
 		}
 	}
 
-	async update(id: Types.ObjectId, updateJwtDto: UpdateJwtDto) {
+	async update(id: string, updateJwtDto: UpdateJwtDto) {
 		const refreshToken = await this.generateRefreshToken(updateJwtDto)
 
 		const accessToken = this.getAccessToken(updateJwtDto)
@@ -48,11 +48,11 @@ export class JwtService {
 		}
 	}
 
-	async findById(id: Types.ObjectId) {
+	async findById(id: string) {
 		return await this.jwtModel.findById({ _id: id })
 	}
 
-	async findByUserId(userId: Types.ObjectId) {
+	async findByUserId(userId: string) {
 		return await this.jwtModel.findOne({ userId })
 	}
 

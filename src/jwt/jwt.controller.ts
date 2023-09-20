@@ -9,9 +9,8 @@ import {
 	Post,
 	Req,
 } from '@nestjs/common'
-import { ApiParam, ApiTags } from '@nestjs/swagger'
+import { ApiBody, ApiTags } from '@nestjs/swagger'
 import { Request } from 'express'
-import { Types } from 'mongoose'
 import { CreateJwtDto } from './dto/create-jwt.dto'
 import { UpdateJwtDto } from './dto/update-jwt.dto'
 import { JwtService } from './jwt.service'
@@ -22,6 +21,16 @@ export class JwtController {
 	constructor(private readonly jwtService: JwtService) {}
 
 	@Post()
+	@ApiBody({
+		schema: {
+			type: 'object',
+			properties: {
+				userId: {
+					default: 'YOUR_ID',
+				},
+			},
+		},
+	})
 	async create(@Body() createJwtDto: CreateJwtDto) {
 		try {
 			return await this.jwtService.create(createJwtDto)
@@ -31,11 +40,17 @@ export class JwtController {
 	}
 
 	@Patch(':id')
-	@ApiParam({ name: 'id', type: String })
-	async update(
-		@Param('id') id: Types.ObjectId,
-		@Body() updateJwtDto: UpdateJwtDto,
-	) {
+	@ApiBody({
+		schema: {
+			type: 'object',
+			properties: {
+				userId: {
+					default: 'YOUR_ID',
+				},
+			},
+		},
+	})
+	async update(@Param('id') id: string, @Body() updateJwtDto: UpdateJwtDto) {
 		try {
 			return this.jwtService.update(id, updateJwtDto)
 		} catch (e) {
@@ -43,9 +58,8 @@ export class JwtController {
 		}
 	}
 
-	@ApiParam({ name: 'userId', type: String })
 	@Get('userId/:userId')
-	async findByUserId(@Param('userId') userId: Types.ObjectId) {
+	async findByUserId(@Param('userId') userId: string) {
 		try {
 			return await this.jwtService.findByUserId(userId)
 		} catch (e) {
@@ -53,9 +67,8 @@ export class JwtController {
 		}
 	}
 
-	@ApiParam({ name: 'id', type: String })
 	@Get('id/:id')
-	async findById(@Param('id') id: Types.ObjectId) {
+	async findById(@Param('id') id: string) {
 		try {
 			return await this.jwtService.findById(id)
 		} catch (e) {

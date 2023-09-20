@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config'
 import { MongooseModule } from '@nestjs/mongoose'
 import { ActivationModule } from './activation/activation.module'
 import { AuthModule } from './auth/auth.module'
+import { FileModule } from './file/file.module'
 
 // App
 @Module({
@@ -21,6 +22,7 @@ import { AuthModule } from './auth/auth.module'
 		}),
 		AuthModule,
 		ActivationModule,
+		FileModule,
 	],
 })
 export class AppModule {}

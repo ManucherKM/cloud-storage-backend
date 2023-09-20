@@ -9,7 +9,7 @@ import {
 	Patch,
 	Post,
 } from '@nestjs/common'
-import { ApiParam, ApiTags } from '@nestjs/swagger'
+import { ApiBody, ApiTags } from '@nestjs/swagger'
 import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { UserService } from './user.service'
@@ -20,6 +20,22 @@ export class UserController {
 	constructor(private readonly userService: UserService) {}
 
 	@Post()
+	@ApiBody({
+		schema: {
+			type: 'object',
+			properties: {
+				email: {
+					default: 'test@gmail.com',
+				},
+				password: {
+					default: 'Test123!?',
+				},
+				activationKey: {
+					default: 'YOUR_KEY',
+				},
+			},
+		},
+	})
 	async create(@Body() createUserDto: CreateUserDto) {
 		try {
 			return await this.userService.create(createUserDto)
@@ -28,8 +44,23 @@ export class UserController {
 		}
 	}
 
-	@ApiParam({ name: 'id', type: String })
 	@Patch(':id')
+	@ApiBody({
+		schema: {
+			type: 'object',
+			properties: {
+				email: {
+					default: 'test@gmail.com',
+				},
+				password: {
+					default: 'Test123!?',
+				},
+				activationKey: {
+					default: 'YOUR_KEY',
+				},
+			},
+		},
+	})
 	update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
 		try {
 			return this.userService.update(id, updateUserDto)

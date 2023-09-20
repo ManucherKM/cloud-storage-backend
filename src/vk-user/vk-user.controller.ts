@@ -9,7 +9,7 @@ import {
 	Patch,
 	Post,
 } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiBody, ApiTags } from '@nestjs/swagger'
 import { CreateVkUserDto } from './dto/create-vk-user.dto'
 import { UpdateVkUserDto } from './dto/update-vk-user.dto'
 import { VkUserService } from './vk-user.service'
@@ -19,6 +19,20 @@ import { VkUserService } from './vk-user.service'
 export class VkUserController {
 	constructor(private readonly vkUserService: VkUserService) {}
 
+	@ApiBody({
+		schema: {
+			type: 'object',
+			properties: {
+				vkId: { default: 'YOUR_ID' },
+				bdate: { default: '01.01.1999' },
+				photo400Orig: {
+					default: 'https://avatars.githubusercontent.com/u/82129323',
+				},
+				firstName: { default: 'Mike' },
+				lastName: { default: 'Smith' },
+			},
+		},
+	})
 	@Post()
 	async create(@Body() createVkUserDto: CreateVkUserDto) {
 		try {
@@ -29,6 +43,20 @@ export class VkUserController {
 	}
 
 	@Patch(':id')
+	@ApiBody({
+		schema: {
+			type: 'object',
+			properties: {
+				vkId: { default: 'YOUR_ID' },
+				bdate: { default: '01.01.1999' },
+				photo400Orig: {
+					default: 'https://avatars.githubusercontent.com/u/82129323',
+				},
+				firstName: { default: 'Mike' },
+				lastName: { default: 'Smith' },
+			},
+		},
+	})
 	async update(
 		@Param('id') id: string,
 		@Body() updateVkUserDto: UpdateVkUserDto,

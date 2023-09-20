@@ -8,7 +8,7 @@ import {
 	Param,
 	Post,
 } from '@nestjs/common'
-import { ApiParam, ApiTags } from '@nestjs/swagger'
+import { ApiBody, ApiTags } from '@nestjs/swagger'
 import { CreateGoogleUserDto } from './dto/create-google-user.dto'
 import { GoogleUserService } from './google-user.service'
 
@@ -18,6 +18,37 @@ export class GoogleUserController {
 	constructor(private readonly googleUserService: GoogleUserService) {}
 
 	@Post()
+	@ApiBody({
+		schema: {
+			type: 'object',
+			properties: {
+				googleId: {
+					default: 'YOUR_ID',
+				},
+				email: {
+					default: 'test@gmail.com',
+				},
+				verifiedEmail: {
+					default: true,
+				},
+				name: {
+					default: 'Mike Smith',
+				},
+				givenName: {
+					default: 'Mike',
+				},
+				familyName: {
+					default: 'Smith',
+				},
+				picture: {
+					default: 'https://avatars.githubusercontent.com/u/82129323',
+				},
+				locale: {
+					default: 'ru',
+				},
+			},
+		},
+	})
 	async create(@Body() createGoogleUserDto: CreateGoogleUserDto) {
 		try {
 			return await this.googleUserService.create(createGoogleUserDto)
@@ -26,7 +57,6 @@ export class GoogleUserController {
 		}
 	}
 
-	@ApiParam({ name: 'id', type: String })
 	@Get('id/:id')
 	async findById(@Param('id') id: string) {
 		try {
@@ -36,7 +66,6 @@ export class GoogleUserController {
 		}
 	}
 
-	@ApiParam({ name: 'googleId', type: String })
 	@Get('googleId/:googleId')
 	async findByGoogleId(@Param('googleId') googleId: string) {
 		try {
@@ -46,7 +75,6 @@ export class GoogleUserController {
 		}
 	}
 
-	@ApiParam({ name: 'email', type: String })
 	@Get('email/:email')
 	async findByEmail(@Param('email') email: string) {
 		try {
