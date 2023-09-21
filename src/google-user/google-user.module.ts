@@ -1,5 +1,4 @@
-import { JwtModule } from '@/jwt/jwt.module'
-import { forwardRef, Module } from '@nestjs/common'
+import { Module } from '@nestjs/common'
 import { MongooseModule } from '@nestjs/mongoose'
 import { GoogleUser, GoogleUserSchema } from './entities/google-user.entity'
 import { GoogleUserController } from './google-user.controller'
