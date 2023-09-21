@@ -1,4 +1,3 @@
-import { JwtAuthGuard } from '@/guard/jwt-auth.guard'
 import {
 	Body,
 	Controller,
@@ -15,7 +14,6 @@ import { CreateGoogleUserDto } from './dto/create-google-user.dto'
 import { GoogleUserService } from './google-user.service'
 
 @ApiTags('Google User')
-@UseGuards(JwtAuthGuard)
 @Controller('google-user')
 export class GoogleUserController {
 	constructor(private readonly googleUserService: GoogleUserService) {}

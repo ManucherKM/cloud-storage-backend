@@ -13,9 +13,11 @@ export class JwtAuthGuard implements CanActivate {
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
 		const req: Request = context.switchToHttp().getRequest()
-		const token = req.headers.authorization.split(' ')[1]
+		const token = req.headers.authorization?.split(' ')[1]
 
-		console.log(token)
+		if (!token) {
+			return false
+		}
 
 		const [isValid] = await this.jwtService.validateToken('access', token)
 

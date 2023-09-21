@@ -1,10 +1,18 @@
-import { Controller, Post, UploadedFile, UseInterceptors } from '@nestjs/common'
+import { JwtAuthGuard } from '@/guard/jwt-auth.guard'
+import {
+	Controller,
+	Post,
+	UploadedFile,
+	UseGuards,
+	UseInterceptors,
+} from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger'
 import { FileService } from './file.service'
 import { fileStorage } from './storage'
 
 @ApiTags('File')
+@UseGuards(JwtAuthGuard)
 @Controller('file')
 export class FileController {
 	constructor(private readonly fileService: FileService) {}
