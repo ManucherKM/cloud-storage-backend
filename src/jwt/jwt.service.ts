@@ -113,10 +113,7 @@ export class JwtService {
 		return refreshToken
 	}
 
-	private async validateToken(
-		variant: `${EVariantValidateToken}`,
-		token: string,
-	) {
+	async validateToken(variant: `${EVariantValidateToken}`, token: string) {
 		let secret = ''
 
 		if (variant === EVariantValidateToken.access) {

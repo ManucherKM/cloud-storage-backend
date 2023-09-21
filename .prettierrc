@@ -13,5 +13,5 @@
   "arrowParens": "avoid",
   "proseWrap": "always",
   "endOfLine": "lf",
-  "organizeImportsSkipDestructiveCodeActions": false
+  "organizeImportsSkipDestructiveCodeActions": true
 }
