@@ -1,10 +1,15 @@
 import { JwtService } from '@/jwt/jwt.service'
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common'
+import {
+	CanActivate,
+	ExecutionContext,
+	Inject,
+	Injectable,
+} from '@nestjs/common'
 import { Request } from 'express'
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-	constructor(private readonly jwtService: JwtService) {}
+	constructor(@Inject(JwtService) private readonly jwtService: JwtService) {}
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
 		const req: Request = context.switchToHttp().getRequest()

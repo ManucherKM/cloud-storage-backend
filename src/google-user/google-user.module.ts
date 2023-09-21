@@ -10,7 +10,6 @@ import { GoogleUserService } from './google-user.service'
 		MongooseModule.forFeature([
 			{ name: GoogleUser.name, schema: GoogleUserSchema },
 		]),
-		forwardRef(() => JwtModule),
 	],
 	controllers: [GoogleUserController],
 	providers: [GoogleUserService],

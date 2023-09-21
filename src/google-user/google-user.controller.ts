@@ -1,4 +1,4 @@
-import { JwtAuthGuard } from '@/jwt/guards/jwt-auth.guard'
+import { JwtAuthGuard } from '@/guard/jwt-auth.guard'
 import {
 	Body,
 	Controller,
