@@ -30,4 +30,8 @@ export class FileService {
 	async findByFileName(fileName: string) {
 		return await this.fileModel.findOne({ fileName })
 	}
+
+	async findByUserId(userId: string) {
+		return await this.fileModel.find({ userId })
+	}
 }

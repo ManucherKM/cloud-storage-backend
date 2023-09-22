@@ -3,6 +3,10 @@ import { JwtAuthGuard } from '@/guard/jwt-auth.guard'
 import {
 	Body,
 	Controller,
+	Get,
+	HttpException,
+	HttpStatus,
+	Param,
 	Post,
 	Request,
 	UploadedFile,
@@ -17,11 +21,11 @@ import { FileService } from './file.service'
 import { fileStorage } from './storage'
 
 @ApiTags('File')
-@UseGuards(JwtAuthGuard)
 @Controller('file')
 export class FileController {
 	constructor(private readonly fileService: FileService) {}
 
+	@UseGuards(JwtAuthGuard)
 	@Post()
 	@UseInterceptors(
 		FileInterceptor('file', {
@@ -46,5 +50,25 @@ export class FileController {
 		@GetUserIdByToken() userId: string,
 	) {
 		return await this.fileService.create(userId, file)
+	}
+
+	@Get('fileName/:fileName')
+	async findById(@Param('fileName') fileName: string) {
+		try {
+			return await this.fileService.findByFileName(fileName)
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
+	}
+
+	@UseGuards(JwtAuthGuard)
+	@ApiBearerAuth()
+	@Get('userId')
+	async findByUserId(@GetUserIdByToken() userId: string) {
+		try {
+			return await this.fileService.findByUserId(userId)
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
 	}
 }
