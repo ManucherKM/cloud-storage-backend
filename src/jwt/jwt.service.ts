@@ -1,5 +1,6 @@
 import { GoogleUserService } from '@/google-user/google-user.service'
 import { UserService } from '@/user/user.service'
+import { EVariantGetData, getDataByToken } from '@/utils/getDataByToken'
 import { VkUserService } from '@/vk-user/vk-user.service'
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
@@ -58,8 +59,8 @@ export class JwtService {
 
 	async getNewAccessToken(refreshToken: string) {
 		const [isValid, dataToken] = await this.validateToken(
-			'refresh',
 			refreshToken,
+			'refresh',
 		)
 
 		if (!isValid) {
@@ -86,8 +87,8 @@ export class JwtService {
 
 		if (foundToken) {
 			const [isValid, _] = await this.validateToken(
-				'refresh',
 				foundToken.refreshToken,
+				'refresh',
 			)
 
 			if (isValid) {
@@ -113,16 +114,8 @@ export class JwtService {
 		return refreshToken
 	}
 
-	async validateToken(variant: `${EVariantValidateToken}`, token: string) {
-		let secret = ''
-
-		if (variant === EVariantValidateToken.access) {
-			secret = process.env.JWT_ACCESS_SECRET
-		} else if (variant === EVariantValidateToken.refresh) {
-			secret = process.env.JWT_REFRESH_SECRET
-		}
-
-		const { userId } = jwt.verify(token, secret) as IDataToken
+	async validateToken(token: string, variant: `${EVariantGetData}`) {
+		const { userId } = getDataByToken(token, variant)
 
 		const foundUser = await this.userService.findById(userId)
 

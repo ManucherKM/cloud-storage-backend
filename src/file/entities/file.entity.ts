@@ -8,6 +8,9 @@ export type FileDocument = HydratedDocument<File>
 })
 export class File {
 	@Prop({ required: true, unique: true })
+	userId: string
+
+	@Prop({ required: true, unique: true })
 	fileName: string
 
 	@Prop({ required: true })
@@ -19,10 +22,10 @@ export class File {
 	@Prop({ required: true })
 	mimetype: string
 
-	@Prop({ required: true })
+	@Prop({ default: false })
 	inTheTrash: boolean
 
-	@Prop({ required: true })
+	@Prop({ default: false })
 	isDeleted: boolean
 }
 

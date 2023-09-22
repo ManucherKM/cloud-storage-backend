@@ -1,13 +1,18 @@
+import { GetUserIdByToken } from '@/decorators/GetUserIdByToken'
 import { JwtAuthGuard } from '@/guard/jwt-auth.guard'
 import {
+	Body,
 	Controller,
 	Post,
+	Request,
 	UploadedFile,
 	UseGuards,
 	UseInterceptors,
 } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
-import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger'
+import { Request as RequestType } from 'express'
+import { CreateFileDto } from './dto/create-file.dto'
 import { FileService } from './file.service'
 import { fileStorage } from './storage'
 
@@ -24,6 +29,7 @@ export class FileController {
 		}),
 	)
 	@ApiConsumes('multipart/form-data')
+	@ApiBearerAuth()
 	@ApiBody({
 		schema: {
 			type: 'object',
@@ -35,11 +41,10 @@ export class FileController {
 			},
 		},
 	})
-	create(@UploadedFile() file: Express.Multer.File) {
-		// return this.fileService.create(createFileDto);
-
-		console.log(file)
-
-		return true
+	async create(
+		@UploadedFile() file: Express.Multer.File,
+		@GetUserIdByToken() userId: string,
+	) {
+		return await this.fileService.create(userId, file)
 	}
 }

@@ -27,6 +27,7 @@ async function bootstrap() {
 			'Interactive documentation for cloud-storage API (https://github.com/ManucherKM/cloud-storage-backend)',
 		)
 		.setVersion('0.0.1')
+		.addBearerAuth()
 		.build()
 
 	const document = SwaggerModule.createDocument(app, config)
