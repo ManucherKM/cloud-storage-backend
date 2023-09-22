@@ -34,4 +34,44 @@ export class FileService {
 	async findByUserId(userId: string) {
 		return await this.fileModel.find({ userId })
 	}
+
+	async findById(id: string) {
+		return await this.fileModel.findById({ _id: id })
+	}
+
+	async trashOn(fileId: string) {
+		const foundFile = await this.findById(fileId)
+
+		if (!foundFile) {
+			throw new BadRequestException('Such a file already exists.')
+		}
+
+		foundFile.inTheTrash = true
+
+		return await foundFile.save()
+	}
+
+	async trashOff(fileId: string) {
+		const foundFile = await this.findById(fileId)
+
+		if (!foundFile) {
+			throw new BadRequestException('Such a file already exists.')
+		}
+
+		foundFile.inTheTrash = false
+
+		return await foundFile.save()
+	}
+
+	async remove(fileId: string) {
+		const foundFile = await this.findById(fileId)
+
+		if (!foundFile) {
+			throw new BadRequestException('Such a file already exists.')
+		}
+
+		foundFile.isDeleted = true
+
+		return await foundFile.save()
+	}
 }

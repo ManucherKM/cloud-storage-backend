@@ -2,6 +2,7 @@ import { GetUserIdByToken } from '@/decorators/GetUserIdByToken'
 import { JwtAuthGuard } from '@/guard/jwt-auth.guard'
 import {
 	Controller,
+	Delete,
 	Get,
 	HttpException,
 	HttpStatus,
@@ -63,6 +64,39 @@ export class FileController {
 	async findByUserId(@GetUserIdByToken() userId: string) {
 		try {
 			return await this.fileService.findByUserId(userId)
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
+	}
+
+	@UseGuards(JwtAuthGuard)
+	@ApiBearerAuth()
+	@Get('trash/on/:fileId')
+	async trashOn(@Param('fileId') fileId: string) {
+		try {
+			return await this.fileService.trashOn(fileId)
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
+	}
+
+	@UseGuards(JwtAuthGuard)
+	@ApiBearerAuth()
+	@Get('trash/off/:fileId')
+	async trashOff(@Param('fileId') fileId: string) {
+		try {
+			return await this.fileService.trashOff(fileId)
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
+	}
+
+	@UseGuards(JwtAuthGuard)
+	@ApiBearerAuth()
+	@Delete(':fileId')
+	async remove(@Param('fileId') fileId: string) {
+		try {
+			return await this.fileService.remove(fileId)
 		} catch (e) {
 			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
 		}
