@@ -7,7 +7,7 @@ export type FileDocument = HydratedDocument<File>
 	timestamps: true,
 })
 export class File {
-	@Prop({ required: true, unique: true })
+	@Prop({ required: true })
 	userId: string
 
 	@Prop({ required: true, unique: true })

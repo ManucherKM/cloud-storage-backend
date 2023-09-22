@@ -7,7 +7,6 @@ import {
 	HttpStatus,
 	Param,
 	Post,
-	UseGuards,
 } from '@nestjs/common'
 import { ApiBody, ApiTags } from '@nestjs/swagger'
 import { CreateGoogleUserDto } from './dto/create-google-user.dto'

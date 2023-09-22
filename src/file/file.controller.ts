@@ -1,22 +1,18 @@
 import { GetUserIdByToken } from '@/decorators/GetUserIdByToken'
 import { JwtAuthGuard } from '@/guard/jwt-auth.guard'
 import {
-	Body,
 	Controller,
 	Get,
 	HttpException,
 	HttpStatus,
 	Param,
 	Post,
-	Request,
 	UploadedFile,
 	UseGuards,
 	UseInterceptors,
 } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger'
-import { Request as RequestType } from 'express'
-import { CreateFileDto } from './dto/create-file.dto'
 import { FileService } from './file.service'
 import { fileStorage } from './storage'
 

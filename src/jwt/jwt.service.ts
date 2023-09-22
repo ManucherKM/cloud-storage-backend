@@ -9,7 +9,7 @@ import { Model } from 'mongoose'
 import { CreateJwtDto } from './dto/create-jwt.dto'
 import { UpdateJwtDto } from './dto/update-jwt.dto'
 import { Jwt } from './entities/jwt.entity'
-import { EVariantValidateToken, IDataToken } from './types'
+import { IDataToken } from './types'
 
 @Injectable()
 export class JwtService {

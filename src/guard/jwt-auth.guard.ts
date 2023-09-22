@@ -1,13 +1,10 @@
 import { JwtService } from '@/jwt/jwt.service'
-import { getDataByToken } from '@/utils/getDataByToken'
 import {
 	CanActivate,
-	createParamDecorator,
 	ExecutionContext,
 	Inject,
 	Injectable,
 } from '@nestjs/common'
-import { Request } from 'express'
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
