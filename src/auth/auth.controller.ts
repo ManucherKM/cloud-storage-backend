@@ -1,6 +1,7 @@
 import {
 	Body,
 	Controller,
+	Get,
 	HttpException,
 	HttpStatus,
 	Post,
@@ -178,6 +179,17 @@ export class AuthController {
 	) {
 		try {
 			return await this.authService.registrationWithVK(registrationWithVKDto)
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
+	}
+
+	@Get('logout')
+	async logout(@Res({ passthrough: true }) res: Response) {
+		try {
+			res.clearCookie('refreshToken')
+
+			return { success: true }
 		} catch (e) {
 			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
 		}
