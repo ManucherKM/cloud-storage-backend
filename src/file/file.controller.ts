@@ -23,7 +23,6 @@ export class FileController {
 	constructor(private readonly fileService: FileService) {}
 
 	@UseGuards(JwtAuthGuard)
-	@Post()
 	@UseInterceptors(
 		FileInterceptor('file', {
 			storage: fileStorage,
@@ -42,6 +41,7 @@ export class FileController {
 			},
 		},
 	})
+	@Post()
 	async create(
 		@UploadedFile() file: Express.Multer.File,
 		@GetUserIdByToken() userId: string,

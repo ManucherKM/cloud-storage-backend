@@ -17,7 +17,7 @@ export class FileService {
 			throw new BadRequestException('Such a file already exists.')
 		}
 
-		await this.fileModel.create({
+		const createdFile = await this.fileModel.create({
 			fileName: file.filename,
 			mimetype: file.mimetype,
 			originalName: file.originalname,
@@ -25,7 +25,7 @@ export class FileService {
 			userId,
 		})
 
-		return { success: true }
+		return this.formatFileModel(createdFile)
 	}
 
 	async findByFileName(fileName: string) {
