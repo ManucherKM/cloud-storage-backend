@@ -1,12 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { HydratedDocument, SchemaTypes } from 'mongoose'
 
-export type FileDocument = HydratedDocument<FileArchive>
+export type ArchiveDocument = HydratedDocument<Archive>
 
 @Schema({
 	timestamps: true,
 })
-export class FileArchive {
+export class Archive {
 	@Prop({ required: true, type: SchemaTypes.ObjectId, ref: 'User' })
 	userId: string
 
@@ -14,4 +14,4 @@ export class FileArchive {
 	fileIds: string[]
 }
 
-export const FileArchiveSchema = SchemaFactory.createForClass(FileArchive)
+export const ArchiveSchema = SchemaFactory.createForClass(Archive)

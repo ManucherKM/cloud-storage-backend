@@ -1,7 +1,6 @@
 import { GetUserIdByToken } from '@/decorators/GetUserIdByToken'
 import { JwtAuthGuard } from '@/guard/jwt-auth.guard'
 import {
-	Body,
 	Controller,
 	Delete,
 	Get,
@@ -15,7 +14,6 @@ import {
 } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger'
-import { ShareFileDto } from './dto/share-file.dto'
 import { FileService } from './file.service'
 import { fileStorage } from './storage'
 
@@ -99,20 +97,6 @@ export class FileController {
 	async remove(@Param('fileId') fileId: string) {
 		try {
 			return await this.fileService.remove(fileId)
-		} catch (e) {
-			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
-		}
-	}
-
-	@UseGuards(JwtAuthGuard)
-	@ApiBearerAuth()
-	@Post('fileArchive')
-	async shareFiles(
-		@GetUserIdByToken() userId: string,
-		@Body() shareFileDto: ShareFileDto,
-	) {
-		try {
-			return await this.fileService.shareFiles(userId, shareFileDto)
 		} catch (e) {
 			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
 		}

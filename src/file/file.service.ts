@@ -1,10 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { promises } from 'fs'
 import { Model, Types } from 'mongoose'
 import { SendFileDto } from './dto/send-file.dto'
-import { ShareFileDto } from './dto/share-file.dto'
-import { FileArchive } from './entities/file-archive.entity'
 import { File } from './entities/file.entity'
 
 export type TFileModel = File & {
@@ -17,8 +14,6 @@ export type TFileModel = File & {
 export class FileService {
 	constructor(
 		@InjectModel(File.name) private readonly fileModel: Model<File>,
-		@InjectModel(FileArchive.name)
-		private readonly fileArchiveModel: Model<FileArchive>,
 	) {}
 
 	async create(userId: string, file: Express.Multer.File) {
@@ -48,7 +43,7 @@ export class FileService {
 		return res.map(item => this.formatFileModel(item.toObject()))
 	}
 
-	async findById(id: string | Types.ObjectId) {
+	async findById(id: string) {
 		return await this.fileModel.findById({ _id: id })
 	}
 
@@ -99,39 +94,5 @@ export class FileService {
 		foundFile.isDeleted = true
 
 		return await foundFile.save()
-	}
-
-	async isFilesExist(fileIds: string | Types.ObjectId[]) {
-		const filePromises: Promise<TFileModel>[] = []
-
-		for (const id of fileIds) {
-			const filePromise = this.findById(id)
-			filePromises.push(filePromise)
-		}
-
-		const files = await Promise.all(filePromises)
-
-		const isFileNotFound = files.some(file => file === null)
-
-		return !isFileNotFound
-	}
-
-	async shareFiles(userId: string, shareFileDto: ShareFileDto) {
-		const { fileIds } = shareFileDto
-
-		const isExist = this.isFilesExist(fileIds)
-
-		if (!isExist) {
-			throw new BadRequestException('The file could not be found.')
-		}
-
-		const createdArchiveFiles = await this.fileArchiveModel.create({
-			userId,
-			fileIds,
-		})
-
-		return {
-			archiveId: createdArchiveFiles._id,
-		}
 	}
 }
