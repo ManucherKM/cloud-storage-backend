@@ -1,3 +1,4 @@
+import { GetUserIdByToken } from '@/decorators/GetUserIdByToken'
 import { JwtAuthGuard } from '@/guard/jwt-auth.guard'
 import {
 	Body,
@@ -40,8 +41,11 @@ export class ArchiveController {
 	@UseGuards(JwtAuthGuard)
 	@ApiBearerAuth()
 	@Post()
-	async create(@Body() createArchiveDto: CreateArchiveDto) {
-		return await this.archiveService.create(createArchiveDto)
+	async create(
+		@Body() createArchiveDto: CreateArchiveDto,
+		@GetUserIdByToken() userId: string,
+	) {
+		return await this.archiveService.create(userId, createArchiveDto)
 	}
 
 	@Get('share/:id')

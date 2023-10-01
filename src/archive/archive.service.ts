@@ -19,7 +19,7 @@ export class ArchiveService {
 		private readonly fileService: FileService,
 	) {}
 
-	async create({ userId, fileIds }: CreateArchiveDto) {
+	async create(userId: string, { fileIds }: CreateArchiveDto) {
 		const isFilesExist = await this.isFilesExist(fileIds)
 
 		if (!isFilesExist) {
