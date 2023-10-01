@@ -9,7 +9,7 @@ import { GoogleUser } from './entities/google-user.entity'
 export class GoogleUserService {
 	private readonly Oauth2Client = new google.auth.OAuth2(
 		process.env.GOOGLE_CLIENT_ID,
-		process.env.GOOGLE_SECRET,
+		process.env.GOOGLE_CLIENT_SECRET,
 		process.env.CLIENT_URL,
 	)
 
