@@ -10,7 +10,7 @@ export class Archive {
 	@Prop({ required: true, type: SchemaTypes.ObjectId, ref: 'User' })
 	userId: string
 
-	@Prop({ required: true })
+	@Prop({ required: true, type: [SchemaTypes.ObjectId], ref: 'File' })
 	fileIds: string[]
 }
 

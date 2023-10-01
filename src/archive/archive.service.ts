@@ -1,9 +1,15 @@
-import { FileService } from '@/file/file.service'
+import { File, FileDocument } from '@/file/entities/file.entity'
+import { FileService, TFileModel } from '@/file/file.service'
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
+import AdmZip from 'adm-zip'
+import { file } from 'googleapis/build/src/apis/file'
 import { Model } from 'mongoose'
+import path from 'path'
 import { CreateArchiveDto } from './dto/create-archive.dto'
-import { Archive } from './entities/archive.entity'
+import { Archive, ArchiveDocument } from './entities/archive.entity'
+
+import fs from 'fs'
 
 @Injectable()
 export class ArchiveService {
@@ -45,5 +51,35 @@ export class ArchiveService {
 
 	async findByUserId(userId: string) {
 		return await this.archiveModel.findOne({ userId })
+	}
+
+	async findById(id: string) {
+		return await this.archiveModel.findById({ _id: id })
+	}
+
+	async share(id: string) {
+		const foundArchive = await this.findById(id)
+
+		if (!foundArchive) {
+			throw new BadRequestException(
+				'The archive containing the files could not be found.',
+			)
+		}
+
+		const populatedArchive = await foundArchive.populate('fileIds')
+
+		const files: FileDocument[] = populatedArchive.fileIds as any[]
+
+		const zip = new AdmZip()
+
+		for (const file of files) {
+			const filePath = path.join('uploads', file.fileName)
+
+			zip.addLocalFile(filePath)
+		}
+
+		const zipBuffer = zip.toBuffer()
+
+		return zipBuffer
 	}
 }

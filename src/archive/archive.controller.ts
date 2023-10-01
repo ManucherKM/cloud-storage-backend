@@ -1,6 +1,17 @@
 import { JwtAuthGuard } from '@/guard/jwt-auth.guard'
-import { Body, Controller, Post, UseGuards } from '@nestjs/common'
+import {
+	Body,
+	Controller,
+	Get,
+	Param,
+	Post,
+	Res,
+	StreamableFile,
+	UseGuards,
+} from '@nestjs/common'
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger'
+import { Response } from 'express'
+import { createReadStream } from 'fs'
 import { ArchiveService } from './archive.service'
 import { CreateArchiveDto } from './dto/create-archive.dto'
 
@@ -29,7 +40,13 @@ export class ArchiveController {
 	@UseGuards(JwtAuthGuard)
 	@ApiBearerAuth()
 	@Post()
-	create(@Body() createArchiveDto: CreateArchiveDto) {
-		return this.archiveService.create(createArchiveDto)
+	async create(@Body() createArchiveDto: CreateArchiveDto) {
+		return await this.archiveService.create(createArchiveDto)
+	}
+
+	@Get('share/:id')
+	async share(@Param('id') id: string) {
+		const zip = await this.archiveService.share(id)
+		return new StreamableFile(zip)
 	}
 }
