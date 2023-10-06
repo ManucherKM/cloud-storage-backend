@@ -39,8 +39,11 @@ export class FileService {
 	}
 
 	async findByUserId(userId: string) {
-		const res = await this.fileModel.find({ userId })
-		return res.map(item => this.formatFileModel(item.toObject()))
+		const foundFiles = await this.fileModel.find({ userId })
+
+		const foundFilesObject = foundFiles.filter(file => !file.isDeleted)
+
+		return foundFilesObject.map(item => this.formatFileModel(item.toObject()))
 	}
 
 	async findById(id: string) {
