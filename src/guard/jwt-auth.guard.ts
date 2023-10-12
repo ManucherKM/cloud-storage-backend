@@ -1,14 +1,9 @@
-import { JwtService } from '@/jwt/jwt.service'
-import {
-	CanActivate,
-	ExecutionContext,
-	Inject,
-	Injectable,
-} from '@nestjs/common'
+import { getDataByToken } from '@/utils/getDataByToken'
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common'
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-	constructor(@Inject(JwtService) private readonly jwtService: JwtService) {}
+	constructor() {}
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
 		try {
@@ -19,11 +14,16 @@ export class JwtAuthGuard implements CanActivate {
 				return false
 			}
 
-			const [isValid] = await this.jwtService.validateToken(token, 'access')
+			const data = getDataByToken(token, 'access')
 
-			return isValid
+			if (!data) {
+				return false
+			}
+
+			return true
 		} catch (e) {
 			console.error(e)
+			return false
 		}
 	}
 }

@@ -1,3 +1,5 @@
+import { GetUserIdByToken } from '@/decorators/GetUserIdByToken'
+import { JwtAuthGuard } from '@/guard/jwt-auth.guard'
 import {
 	Body,
 	Controller,
@@ -8,8 +10,9 @@ import {
 	Param,
 	Patch,
 	Post,
+	UseGuards,
 } from '@nestjs/common'
-import { ApiBody, ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger'
 import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { UserService } from './user.service'
@@ -44,7 +47,9 @@ export class UserController {
 		}
 	}
 
-	@Patch(':id')
+	@Patch()
+	@UseGuards(JwtAuthGuard)
+	@ApiBearerAuth()
 	@ApiBody({
 		schema: {
 			type: 'object',
@@ -61,9 +66,14 @@ export class UserController {
 			},
 		},
 	})
-	update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+	update(
+		@GetUserIdByToken() userId: string,
+		@Body() updateUserDto: UpdateUserDto,
+	) {
 		try {
-			return this.userService.update(id, updateUserDto)
+			console.log(userId, updateUserDto)
+
+			return this.userService.update(userId, updateUserDto)
 		} catch (e) {
 			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
 		}

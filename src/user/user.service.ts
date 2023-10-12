@@ -20,18 +20,18 @@ export class UserService {
 		return await this.userModel.create(createUserDto)
 	}
 
-	async update(id: string, updateUserDto: UpdateUserDto) {
+	async update(userId: string, updateUserDto: UpdateUserDto) {
 		const { password, ...other } = updateUserDto
 
 		if (password) {
 			const passwordHash = await getHash(password)
 			return await this.userModel.updateOne(
-				{ _id: id },
+				{ _id: userId },
 				{ password: passwordHash, ...other },
 			)
 		}
 
-		return await this.userModel.updateOne({ _id: id }, updateUserDto)
+		return await this.userModel.updateOne({ _id: userId }, updateUserDto)
 	}
 
 	async findByActivationKey(activationKey: string) {

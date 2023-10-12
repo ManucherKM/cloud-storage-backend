@@ -1,3 +1,4 @@
+import { JwtModule } from '@/jwt/jwt.module'
 import { Module } from '@nestjs/common'
 import { MongooseModule } from '@nestjs/mongoose'
 import { User, UserSchema } from './entities/user.entity'
