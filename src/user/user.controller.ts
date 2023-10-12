@@ -66,14 +66,13 @@ export class UserController {
 			},
 		},
 	})
-	update(
+	async update(
 		@GetUserIdByToken() userId: string,
 		@Body() updateUserDto: UpdateUserDto,
 	) {
 		try {
-			console.log(userId, updateUserDto)
-
-			return this.userService.update(userId, updateUserDto)
+			const isSuccess = await this.userService.update(userId, updateUserDto)
+			return { success: isSuccess }
 		} catch (e) {
 			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
 		}

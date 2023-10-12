@@ -3,7 +3,6 @@ import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { CreateOtpDto } from './dto/create-otp.dto'
-import { UpdateOtpDto } from './dto/update-otp.dto'
 import { Otp } from './entities/otp.entity'
 
 @Injectable()
@@ -16,11 +15,13 @@ export class OtpService {
 	async create({ email }: CreateOtpDto) {
 		const foundOtp = await this.findbyEmail(email)
 
-		if (foundOtp) {
-			return foundOtp.otp
-		}
-
 		const otp = await this.generateOtp(email)
+
+		if (foundOtp) {
+			foundOtp.otp = otp
+			await foundOtp.save()
+			return otp
+		}
 
 		await this.otpModel.create({
 			email,
@@ -48,5 +49,15 @@ export class OtpService {
 		}
 
 		return otp
+	}
+
+	async removeByOtp(otp: number) {
+		const foundOtp = await this.findbyOtp(otp)
+
+		if (!foundOtp) {
+			throw new BadRequestException('The one-time password could not be found.')
+		}
+
+		return await this.otpModel.deleteOne({ otp })
 	}
 }

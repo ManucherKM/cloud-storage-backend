@@ -4,7 +4,6 @@ import { UserService } from '@/user/user.service'
 import { MailerService } from '@nestjs-modules/mailer'
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { CreateRestoreAccountDto } from './dto/create-restore-account.dto'
-import { UpdateRestoreAccountDto } from './dto/update-restore-account.dto'
 import { VerificationOtpDto } from './dto/verification-otp.dto'
 
 @Injectable()
@@ -57,6 +56,8 @@ export class RestoreAccountService {
 		const accessToken = this.jwtService.getAccessToken({
 			userId,
 		})
+
+		await this.otpService.removeByOtp(otp)
 
 		return {
 			accessToken,

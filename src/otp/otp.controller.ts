@@ -1,16 +1,11 @@
 import {
 	Body,
 	Controller,
-	Delete,
-	Get,
 	HttpException,
 	HttpStatus,
-	Param,
-	Patch,
 	Post,
 } from '@nestjs/common'
 import { CreateOtpDto } from './dto/create-otp.dto'
-import { UpdateOtpDto } from './dto/update-otp.dto'
 import { OtpService } from './otp.service'
 
 @Controller('otp')

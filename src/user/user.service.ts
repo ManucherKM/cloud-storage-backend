@@ -31,7 +31,12 @@ export class UserService {
 			)
 		}
 
-		return await this.userModel.updateOne({ _id: userId }, updateUserDto)
+		const updatedOtp = await this.userModel.updateOne(
+			{ _id: userId },
+			updateUserDto,
+		)
+
+		return updatedOtp.acknowledged
 	}
 
 	async findByActivationKey(activationKey: string) {

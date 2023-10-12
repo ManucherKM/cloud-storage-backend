@@ -1,15 +1,12 @@
-import { File, FileDocument } from '@/file/entities/file.entity'
-import { FileService, TFileModel } from '@/file/file.service'
+import { FileDocument } from '@/file/entities/file.entity'
+import { FileService } from '@/file/file.service'
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import AdmZip from 'adm-zip'
-import { file } from 'googleapis/build/src/apis/file'
 import { Model } from 'mongoose'
 import path from 'path'
 import { CreateArchiveDto } from './dto/create-archive.dto'
-import { Archive, ArchiveDocument } from './entities/archive.entity'
-
-import fs from 'fs'
+import { Archive } from './entities/archive.entity'
 
 @Injectable()
 export class ArchiveService {

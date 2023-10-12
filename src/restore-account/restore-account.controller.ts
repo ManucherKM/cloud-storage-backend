@@ -1,15 +1,6 @@
-import {
-	Body,
-	Controller,
-	Delete,
-	Get,
-	Param,
-	Patch,
-	Post,
-} from '@nestjs/common'
+import { Body, Controller, Post } from '@nestjs/common'
 import { ApiBody, ApiTags } from '@nestjs/swagger'
 import { CreateRestoreAccountDto } from './dto/create-restore-account.dto'
-import { UpdateRestoreAccountDto } from './dto/update-restore-account.dto'
 import { VerificationOtpDto } from './dto/verification-otp.dto'
 import { RestoreAccountService } from './restore-account.service'
 

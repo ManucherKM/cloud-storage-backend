@@ -1,7 +1,6 @@
-import { IsNotEmpty, IsString } from 'class-validator'
+import { IsEmail } from 'class-validator'
 
 export class CreateRestoreAccountDto {
-	@IsNotEmpty()
-	@IsString()
+	@IsEmail()
 	email: string
 }

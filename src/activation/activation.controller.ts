@@ -18,7 +18,7 @@ export class ActivationController {
 	async activationAccount(@Param('key') key: string, @Res() res) {
 		try {
 			await this.activationService.activationAccount(key)
-			res.status(302).redirect(process.env.CLIENT_URL + '/login')
+			res.status(302).redirect(process.env.CLIENT_URL + '/auth/login')
 			return { success: true }
 		} catch (e) {
 			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)

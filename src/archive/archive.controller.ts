@@ -6,13 +6,10 @@ import {
 	Get,
 	Param,
 	Post,
-	Res,
 	StreamableFile,
 	UseGuards,
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger'
-import { Response } from 'express'
-import { createReadStream } from 'fs'
 import { ArchiveService } from './archive.service'
 import { CreateArchiveDto } from './dto/create-archive.dto'
 
