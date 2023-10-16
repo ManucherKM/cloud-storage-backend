@@ -5,9 +5,11 @@ import { MongooseModule } from '@nestjs/mongoose'
 import { ActivationModule } from './activation/activation.module'
 import { ArchiveModule } from './archive/archive.module'
 import { AuthModule } from './auth/auth.module'
+import { ConfigModule as UserConfigModule } from './config/config.module'
 import { FileModule } from './file/file.module'
 import { OtpModule } from './otp/otp.module'
 import { RestoreAccountModule } from './restore-account/restore-account.module'
+import { ThemeModule } from './theme/theme.module'
 
 // App
 @Module({
@@ -29,6 +31,8 @@ import { RestoreAccountModule } from './restore-account/restore-account.module'
 		ArchiveModule,
 		OtpModule,
 		RestoreAccountModule,
+		ThemeModule,
+		UserConfigModule,
 	],
 })
 export class AppModule {}
