@@ -1,5 +1,1 @@
-export class CreateFileDto {
-	// @IsString()
-	// @IsNotEmpty()
-	userId: string
-}
+export class CreateFileDto {}

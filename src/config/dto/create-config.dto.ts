@@ -1,8 +1,8 @@
 import { IsOptional, IsString } from 'class-validator'
 
 export class CreateConfigDto {
-	@IsString()
 	@IsOptional()
+	@IsString()
 	round: string
 
 	@IsOptional()

@@ -4,7 +4,6 @@ import {
 	Body,
 	Controller,
 	Delete,
-	Get,
 	HttpException,
 	HttpStatus,
 	Param,
@@ -22,7 +21,6 @@ import { UserService } from './user.service'
 export class UserController {
 	constructor(private readonly userService: UserService) {}
 
-	@Post()
 	@ApiBody({
 		schema: {
 			type: 'object',
@@ -39,17 +37,16 @@ export class UserController {
 			},
 		},
 	})
+	@Post()
 	async create(@Body() createUserDto: CreateUserDto) {
 		try {
-			return await this.userService.create(createUserDto)
+			const createdUser = await this.userService.create(createUserDto)
+			return createdUser.toObject()
 		} catch (e) {
 			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
 		}
 	}
 
-	@Patch()
-	@UseGuards(JwtAuthGuard)
-	@ApiBearerAuth()
 	@ApiBody({
 		schema: {
 			type: 'object',
@@ -66,49 +63,16 @@ export class UserController {
 			},
 		},
 	})
+	@ApiBearerAuth()
+	@UseGuards(JwtAuthGuard)
+	@Patch()
 	async update(
 		@GetUserIdByToken() userId: string,
 		@Body() updateUserDto: UpdateUserDto,
 	) {
 		try {
-			const isSuccess = await this.userService.update(userId, updateUserDto)
-			return { success: isSuccess }
-		} catch (e) {
-			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
-		}
-	}
-
-	@Get('email/:email')
-	async findByEmail(@Param('email') email: string) {
-		try {
-			return await this.userService.findByEmail(email)
-		} catch (e) {
-			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
-		}
-	}
-
-	@Get('id/:id')
-	async findById(@Param('id') id: string) {
-		try {
-			return await this.userService.findById(id)
-		} catch (e) {
-			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
-		}
-	}
-
-	@Get('activationKey/:activationKey')
-	async findByActivationKey(@Param('activationKey') activationKey: string) {
-		try {
-			return await this.userService.findByActivationKey(activationKey)
-		} catch (e) {
-			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
-		}
-	}
-
-	@Get('all')
-	async findAll() {
-		try {
-			return await this.userService.findAll()
+			const updatedUser = await this.userService.update(userId, updateUserDto)
+			return { success: !!updatedUser.modifiedCount }
 		} catch (e) {
 			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
 		}
@@ -117,7 +81,8 @@ export class UserController {
 	@Delete(':id')
 	async remove(@Param('id') id: string) {
 		try {
-			return await this.userService.remove(id)
+			const deletedUser = await this.userService.remove(id)
+			return { success: !!deletedUser.deletedCount }
 		} catch (e) {
 			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
 		}

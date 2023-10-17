@@ -49,16 +49,4 @@ export class GoogleUserService {
 	async findByEmail(email: string) {
 		return await this.googleUserModel.findOne({ email })
 	}
-
-	async findByGoogleId(googleId: string) {
-		return await this.googleUserModel.findOne({ googleId })
-	}
-
-	async findAll() {
-		return await this.googleUserModel.find()
-	}
-
-	async remove(id: string) {
-		return await this.googleUserModel.deleteOne({ _id: id })
-	}
 }

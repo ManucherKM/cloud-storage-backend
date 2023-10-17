@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model, Types } from 'mongoose'
-import { SendFileDto } from './dto/send-file.dto'
 import { File } from './entities/file.entity'
+import { SendFile } from './types'
 
 export type TFileModel = File & {
 	_id: Types.ObjectId
@@ -23,15 +23,13 @@ export class FileService {
 			throw new BadRequestException('Such a file already exists.')
 		}
 
-		const createdFile = await this.fileModel.create({
+		return await this.fileModel.create({
 			fileName: file.filename,
 			mimetype: file.mimetype,
 			originalName: file.originalname,
 			size: file.size,
 			userId,
 		})
-
-		return this.formatFileModel(createdFile.toObject())
 	}
 
 	async findByFileName(fileName: string) {
@@ -41,22 +39,13 @@ export class FileService {
 	async findByUserId(userId: string) {
 		const foundFiles = await this.fileModel.find({ userId })
 
-		const foundFilesObject = foundFiles.filter(file => !file.isDeleted)
+		const filteredfoundFiles = foundFiles.filter(file => !file.isDeleted)
 
-		return foundFilesObject.map(item => this.formatFileModel(item.toObject()))
+		return filteredfoundFiles
 	}
 
 	async findById(id: string) {
 		return await this.fileModel.findById({ _id: id })
-	}
-
-	private formatFileModel(fileModel: TFileModel) {
-		return {
-			id: fileModel._id,
-			fileName: fileModel.fileName,
-			inTheTrash: fileModel.inTheTrash,
-			originalName: fileModel.originalName,
-		} as SendFileDto
 	}
 
 	async trashOn(fileId: string) {
@@ -68,9 +57,7 @@ export class FileService {
 
 		foundFile.inTheTrash = true
 
-		const savedFile = await foundFile.save()
-
-		return this.formatFileModel(savedFile.toObject())
+		return await foundFile.save()
 	}
 
 	async trashOff(fileId: string) {
@@ -82,9 +69,7 @@ export class FileService {
 
 		foundFile.inTheTrash = false
 
-		const savedFile = await foundFile.save()
-
-		return this.formatFileModel(savedFile.toObject())
+		return await foundFile.save()
 	}
 
 	async remove(fileId: string) {
@@ -97,5 +82,14 @@ export class FileService {
 		foundFile.isDeleted = true
 
 		return await foundFile.save()
+	}
+
+	formatFileModel(fileModel: TFileModel): SendFile {
+		return {
+			id: fileModel._id.toString(),
+			fileName: fileModel.fileName,
+			inTheTrash: fileModel.inTheTrash,
+			originalName: fileModel.originalName,
+		}
 	}
 }

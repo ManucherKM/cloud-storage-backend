@@ -3,8 +3,6 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common'
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-	constructor() {}
-
 	async canActivate(context: ExecutionContext): Promise<boolean> {
 		try {
 			const req = context.switchToHttp().getRequest()
@@ -16,7 +14,7 @@ export class JwtAuthGuard implements CanActivate {
 
 			const data = getDataByToken(token, 'access')
 
-			if (!data) {
+			if (!data.userId) {
 				return false
 			}
 

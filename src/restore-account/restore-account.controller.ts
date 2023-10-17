@@ -1,4 +1,10 @@
-import { Body, Controller, Post } from '@nestjs/common'
+import {
+	Body,
+	Controller,
+	HttpException,
+	HttpStatus,
+	Post,
+} from '@nestjs/common'
 import { ApiBody, ApiTags } from '@nestjs/swagger'
 import { CreateRestoreAccountDto } from './dto/create-restore-account.dto'
 import { VerificationOtpDto } from './dto/verification-otp.dto'
@@ -9,7 +15,6 @@ import { RestoreAccountService } from './restore-account.service'
 export class RestoreAccountController {
 	constructor(private readonly restoreAccountService: RestoreAccountService) {}
 
-	@Post()
 	@ApiBody({
 		schema: {
 			type: 'object',
@@ -20,8 +25,14 @@ export class RestoreAccountController {
 			},
 		},
 	})
+	@Post()
 	async createOtp(@Body() createRestoreAccountDto: CreateRestoreAccountDto) {
-		return await this.restoreAccountService.createOtp(createRestoreAccountDto)
+		try {
+			await this.restoreAccountService.createOtp(createRestoreAccountDto)
+			return { success: true }
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
 	}
 
 	@ApiBody({
@@ -39,6 +50,13 @@ export class RestoreAccountController {
 	})
 	@Post('verification')
 	async verificationOtp(@Body() verificationOtpDto: VerificationOtpDto) {
-		return await this.restoreAccountService.verificationOtp(verificationOtpDto)
+		try {
+			const { accessToken } =
+				await this.restoreAccountService.verificationOtp(verificationOtpDto)
+
+			return { accessToken }
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
 	}
 }

@@ -29,10 +29,6 @@ export class VkUserService {
 		return await this.vkUserModel.findOne({ vkId })
 	}
 
-	async findAll() {
-		return await this.vkUserModel.find()
-	}
-
 	async update(id: string, updateVkUserDto: UpdateVkUserDto) {
 		return await this.vkUserModel.updateOne({ _id: id }, updateVkUserDto)
 	}

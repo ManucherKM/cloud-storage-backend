@@ -26,7 +26,7 @@ export class RestoreAccountService {
 
 		await this.sendOtpToEmail(otp, email)
 
-		return { success: true }
+		return otp
 	}
 
 	async sendOtpToEmail(otp: number, email: string) {

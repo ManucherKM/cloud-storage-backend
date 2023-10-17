@@ -5,7 +5,7 @@ import { CreateThemeDto } from './dto/create-theme.dto'
 import { Theme } from './entities/theme.entity'
 import { IResponseTheme, ITheme, ThemeModel } from './types'
 
-export const defaultThemes: ITheme[] = [
+const defaultThemes: ITheme[] = [
 	{
 		black1000: '#212529',
 		black500: '#282c31',
@@ -68,16 +68,26 @@ export class ThemeService {
 	}
 
 	async create(userId: string, createThemeDto: CreateThemeDto) {
+		const foundTheme = await this.foundByTheme(createThemeDto)
+
+		if (foundTheme) {
+			throw new BadRequestException('This color theme already exists')
+		}
+
 		return await this.themeModel.create({ userId, ...createThemeDto })
+	}
+
+	async foundByTheme(theme: ITheme) {
+		return await this.themeModel.find(theme)
 	}
 
 	async findById(id: string) {
 		return await this.themeModel.findById({ _id: id })
 	}
 
-	themeDto(theme: ThemeModel) {
+	themeDto(theme: ThemeModel): IResponseTheme {
 		return {
-			id: theme._id,
+			id: theme._id.toString(),
 			black1000: theme.black1000,
 			black500: theme.black500,
 			dominant1: theme.dominant1,
@@ -97,17 +107,9 @@ export class ThemeService {
 		const res: IResponseTheme[] = []
 
 		for (const theme of foundThemes) {
-			res.push({
-				id: theme._id.toString(),
-				black1000: theme.black1000,
-				black250: theme.black250,
-				black500: theme.black500,
-				dominant1: theme.dominant1,
-				dominant2: theme.dominant2,
-				warning: theme.warning,
-			})
+			res.push(this.themeDto(theme))
 		}
 
-		return { themes: res }
+		return res
 	}
 }

@@ -14,7 +14,6 @@ import { OtpService } from './otp.service'
 export class OtpController {
 	constructor(private readonly otpService: OtpService) {}
 
-	@Post()
 	@ApiBody({
 		schema: {
 			type: 'object',
@@ -25,9 +24,11 @@ export class OtpController {
 			},
 		},
 	})
+	@Post()
 	async create(@Body() createOtpDto: CreateOtpDto) {
 		try {
-			return await this.otpService.create(createOtpDto)
+			const otp = await this.otpService.create(createOtpDto)
+			return otp
 		} catch (e) {
 			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
 		}

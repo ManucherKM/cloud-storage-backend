@@ -1,5 +1,5 @@
-import { FileDocument } from '@/file/entities/file.entity'
 import { FileService } from '@/file/file.service'
+import { FileModel } from '@/file/types'
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import AdmZip from 'adm-zip'
@@ -28,7 +28,7 @@ export class ArchiveService {
 			fileIds,
 		})
 
-		return { id: createdArchive._id }
+		return createdArchive
 	}
 
 	private async isFilesExist(fileIds: string[]) {
@@ -63,15 +63,16 @@ export class ArchiveService {
 			)
 		}
 
-		const populatedArchive = await foundArchive.populate('fileIds')
+		const populatedArchive = await foundArchive.populate<{
+			fileIds: FileModel[]
+		}>('fileIds')
 
-		const files: FileDocument[] = populatedArchive.fileIds as any[]
+		const files = populatedArchive.fileIds
 
 		const zip = new AdmZip()
 
 		for (const file of files) {
 			const filePath = path.join('uploads', file.fileName)
-
 			zip.addLocalFile(filePath)
 		}
 

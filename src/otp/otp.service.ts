@@ -14,7 +14,6 @@ export class OtpService {
 
 	async create({ email }: CreateOtpDto) {
 		const foundOtp = await this.findbyEmail(email)
-
 		const otp = await this.generateOtp(email)
 
 		if (foundOtp) {

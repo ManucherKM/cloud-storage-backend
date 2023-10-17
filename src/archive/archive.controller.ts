@@ -4,6 +4,8 @@ import {
 	Body,
 	Controller,
 	Get,
+	HttpException,
+	HttpStatus,
 	Param,
 	Post,
 	StreamableFile,
@@ -23,31 +25,43 @@ export class ArchiveController {
 			type: 'object',
 			properties: {
 				userId: {
-					default: 'YOUR_ID',
+					default: 'USER_ID',
 				},
 				fileIds: {
 					type: 'array',
 					items: {
 						type: 'string',
 					},
-					default: ['YOUR_FILE_ID'],
+					default: ['FILE_ID'],
 				},
 			},
 		},
 	})
-	@UseGuards(JwtAuthGuard)
 	@ApiBearerAuth()
+	@UseGuards(JwtAuthGuard)
 	@Post()
 	async create(
 		@Body() createArchiveDto: CreateArchiveDto,
 		@GetUserIdByToken() userId: string,
 	) {
-		return await this.archiveService.create(userId, createArchiveDto)
+		try {
+			const createdArchive = await this.archiveService.create(
+				userId,
+				createArchiveDto,
+			)
+			return { id: createdArchive._id }
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
 	}
 
 	@Get('share/:id')
 	async share(@Param('id') id: string) {
-		const zip = await this.archiveService.share(id)
-		return new StreamableFile(zip)
+		try {
+			const zipBuffer = await this.archiveService.share(id)
+			return new StreamableFile(zipBuffer)
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
 	}
 }

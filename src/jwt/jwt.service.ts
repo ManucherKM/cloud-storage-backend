@@ -22,7 +22,6 @@ export class JwtService {
 
 	async create(createJwtDto: CreateJwtDto) {
 		const refreshToken = await this.generateRefreshToken(createJwtDto)
-
 		const accessToken = this.getAccessToken(createJwtDto)
 
 		return {

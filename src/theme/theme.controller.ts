@@ -1,6 +1,14 @@
 import { GetUserIdByToken } from '@/decorators/GetUserIdByToken'
 import { JwtAuthGuard } from '@/guard/jwt-auth.guard'
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common'
+import {
+	Body,
+	Controller,
+	Get,
+	HttpException,
+	HttpStatus,
+	Post,
+	UseGuards,
+} from '@nestjs/common'
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger'
 import { CreateThemeDto } from './dto/create-theme.dto'
 import { ThemeService } from './theme.service'
@@ -10,9 +18,6 @@ import { ThemeService } from './theme.service'
 export class ThemeController {
 	constructor(private readonly themeService: ThemeService) {}
 
-	@Post()
-	@UseGuards(JwtAuthGuard)
-	@ApiBearerAuth()
 	@ApiBody({
 		schema: {
 			type: 'object',
@@ -38,24 +43,35 @@ export class ThemeController {
 			},
 		},
 	})
+	@ApiBearerAuth()
+	@UseGuards(JwtAuthGuard)
+	@Post()
 	async create(
 		@GetUserIdByToken() userId: string,
 		@Body() createThemeDto: CreateThemeDto,
 	) {
-		return await this.themeService.create(userId, createThemeDto)
+		try {
+			const createdTheme = await this.themeService.create(
+				userId,
+				createThemeDto,
+			)
+			return createdTheme.toObject()
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
 	}
 
-	@Get(':id')
-	@UseGuards(JwtAuthGuard)
-	@ApiBearerAuth()
-	async findById(@Param('id') id: string) {
-		return await this.themeService.findById(id)
-	}
-
-	@Get()
+	@Get('all')
 	@UseGuards(JwtAuthGuard)
 	@ApiBearerAuth()
 	async findAll() {
-		return await this.themeService.findAll()
+		try {
+			const foundThemes = await this.themeService.findAll()
+			return {
+				themes: foundThemes,
+			}
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
 	}
 }

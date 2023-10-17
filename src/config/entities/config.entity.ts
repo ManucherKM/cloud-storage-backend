@@ -20,10 +20,10 @@ export class Config {
 		type: SchemaTypes.ObjectId,
 		ref: 'Theme',
 	})
-	themeId: string
+	themeId: string | null
 
 	@Prop({ default: null })
-	round: string
+	round: string | null
 }
 
 export const ConfigSchema = SchemaFactory.createForClass(Config)

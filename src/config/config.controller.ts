@@ -20,9 +20,6 @@ import { UpdateConfigDto } from './dto/update-config.dto'
 export class ConfigController {
 	constructor(private readonly configService: ConfigService) {}
 
-	@Post()
-	@UseGuards(JwtAuthGuard)
-	@ApiBearerAuth()
 	@ApiBody({
 		schema: {
 			type: 'object',
@@ -32,46 +29,63 @@ export class ConfigController {
 					default: '10',
 				},
 				themeId: {
-					default: 'YOUR_THEME_ID',
+					default: 'THEME_ID',
 				},
 			},
 		},
 	})
+	@ApiBearerAuth()
+	@UseGuards(JwtAuthGuard)
+	@Post()
 	async create(
 		@GetUserIdByToken() userId: string,
 		@Body() createConfigDto: CreateConfigDto,
 	) {
-		return await this.configService.create(userId, createConfigDto)
-	}
-
-	@Patch()
-	@UseGuards(JwtAuthGuard)
-	@ApiBearerAuth()
-	@ApiBody({
-		schema: {
-			type: 'object',
-			properties: {
-				themeId: {
-					default: 'YOUR_THEME_ID',
-				},
-			},
-		},
-	})
-	async update(
-		@GetUserIdByToken() userId: string,
-		@Body() updateConfigDto: UpdateConfigDto,
-	) {
 		try {
-			return await this.configService.update(userId, updateConfigDto)
+			await this.configService.create(userId, createConfigDto)
+			return { success: true }
 		} catch (e) {
 			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
 		}
 	}
 
-	@Get()
-	@UseGuards(JwtAuthGuard)
+	@ApiBody({
+		schema: {
+			type: 'object',
+			properties: {
+				themeId: {
+					default: 'THEME_ID',
+				},
+			},
+		},
+	})
 	@ApiBearerAuth()
+	@UseGuards(JwtAuthGuard)
+	@Patch()
+	async update(
+		@GetUserIdByToken() userId: string,
+		@Body() updateConfigDto: UpdateConfigDto,
+	) {
+		try {
+			const updatedConfig = await this.configService.update(
+				userId,
+				updateConfigDto,
+			)
+			return { success: !!updatedConfig.modifiedCount }
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
+	}
+
+	@ApiBearerAuth()
+	@UseGuards(JwtAuthGuard)
+	@Get()
 	async findByUserId(@GetUserIdByToken() userId: string) {
-		return await this.configService.findByUserId(userId)
+		try {
+			const foundConfig = await this.configService.findByUserId(userId)
+			return foundConfig
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
 	}
 }

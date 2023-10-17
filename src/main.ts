@@ -2,11 +2,13 @@ import { ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import cookieParser from 'cookie-parser'
+import env from 'env-var'
 import * as express from 'express'
 import { join } from 'path'
 import { AppModule } from './app.module'
 
 const PORT = process.env.PORT || 5000
+const CLIENT_URL = env.get('CLIENT_URL').required().asString()
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule)
@@ -23,7 +25,7 @@ async function bootstrap() {
 
 	app.use('/uploads', express.static(join(__dirname, '..', 'uploads')))
 
-	app.enableCors({ credentials: true, origin: 'http://localhost:5173' })
+	app.enableCors({ credentials: true, origin: CLIENT_URL })
 
 	const config = new DocumentBuilder()
 		.setTitle('Cloud storage API')

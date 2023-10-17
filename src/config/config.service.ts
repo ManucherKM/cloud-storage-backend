@@ -26,18 +26,11 @@ export class ConfigService {
 			throw new BadRequestException('Could not find a topic with this id.')
 		}
 
-		await this.configModel.create({ userId, ...createConfigDto })
-
-		return { success: true }
+		return await this.configModel.create({ userId, ...createConfigDto })
 	}
 
 	async update(userId: string, updateConfigDto: UpdateConfigDto) {
-		const updatedConfig = await this.configModel.updateOne(
-			{ userId },
-			updateConfigDto,
-		)
-
-		return { success: !!updatedConfig.modifiedCount }
+		return await this.configModel.updateOne({ userId }, updateConfigDto)
 	}
 
 	async findByUserId(userId: string) {

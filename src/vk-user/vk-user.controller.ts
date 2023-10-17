@@ -2,7 +2,6 @@ import {
 	Body,
 	Controller,
 	Delete,
-	Get,
 	HttpException,
 	HttpStatus,
 	Param,
@@ -23,7 +22,7 @@ export class VkUserController {
 		schema: {
 			type: 'object',
 			properties: {
-				vkId: { default: 'YOUR_ID' },
+				vkId: { default: 'VK_ID' },
 				bdate: { default: '01.01.1999' },
 				photo400Orig: {
 					default: 'https://avatars.githubusercontent.com/u/82129323',
@@ -36,18 +35,18 @@ export class VkUserController {
 	@Post()
 	async create(@Body() createVkUserDto: CreateVkUserDto) {
 		try {
-			return await this.vkUserService.create(createVkUserDto)
+			const createdUser = await this.vkUserService.create(createVkUserDto)
+			return createdUser.toObject()
 		} catch (e) {
 			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
 		}
 	}
 
-	@Patch(':id')
 	@ApiBody({
 		schema: {
 			type: 'object',
 			properties: {
-				vkId: { default: 'YOUR_ID' },
+				vkId: { default: 'VK_ID' },
 				bdate: { default: '01.01.1999' },
 				photo400Orig: {
 					default: 'https://avatars.githubusercontent.com/u/82129323',
@@ -57,39 +56,14 @@ export class VkUserController {
 			},
 		},
 	})
+	@Patch(':id')
 	async update(
 		@Param('id') id: string,
 		@Body() updateVkUserDto: UpdateVkUserDto,
 	) {
 		try {
-			return this.vkUserService.update(id, updateVkUserDto)
-		} catch (e) {
-			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
-		}
-	}
-
-	@Get('id/:id')
-	async findById(@Param('id') id: string) {
-		try {
-			return await this.vkUserService.findById(id)
-		} catch (e) {
-			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
-		}
-	}
-
-	@Get('vkId/:vkId')
-	async findByVkId(@Param('vkId') vkId: string) {
-		try {
-			return await this.vkUserService.findByVkId(+vkId)
-		} catch (e) {
-			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
-		}
-	}
-
-	@Get('all')
-	async findAll() {
-		try {
-			return await this.vkUserService.findAll()
+			const updatedUser = await this.vkUserService.update(id, updateVkUserDto)
+			return { success: !!updatedUser.modifiedCount }
 		} catch (e) {
 			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
 		}
@@ -98,7 +72,8 @@ export class VkUserController {
 	@Delete(':id')
 	async remove(@Param('id') id: string) {
 		try {
-			return await this.vkUserService.remove(id)
+			const deletedUser = await this.vkUserService.remove(id)
+			return { success: !!deletedUser.deletedCount }
 		} catch (e) {
 			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
 		}

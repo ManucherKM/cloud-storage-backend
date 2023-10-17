@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import { HydratedDocument } from 'mongoose'
+import { HydratedDocument, SchemaTypes } from 'mongoose'
 
 export type FileDocument = HydratedDocument<File>
 
@@ -7,7 +7,7 @@ export type FileDocument = HydratedDocument<File>
 	timestamps: true,
 })
 export class File {
-	@Prop({ required: true })
+	@Prop({ required: true, type: SchemaTypes.ObjectId, ref: 'User' })
 	userId: string
 
 	@Prop({ required: true, unique: true })

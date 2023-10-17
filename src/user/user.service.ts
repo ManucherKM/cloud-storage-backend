@@ -31,12 +31,7 @@ export class UserService {
 			)
 		}
 
-		const updatedOtp = await this.userModel.updateOne(
-			{ _id: userId },
-			updateUserDto,
-		)
-
-		return updatedOtp.acknowledged
+		return await this.userModel.updateOne({ _id: userId }, updateUserDto)
 	}
 
 	async findByActivationKey(activationKey: string) {
@@ -49,10 +44,6 @@ export class UserService {
 
 	async findById(id: string) {
 		return await this.userModel.findById({ _id: id })
-	}
-
-	async findAll() {
-		return await this.userModel.find()
 	}
 
 	async remove(id: string) {
