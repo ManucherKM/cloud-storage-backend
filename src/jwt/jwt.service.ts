@@ -7,7 +7,6 @@ import { InjectModel } from '@nestjs/mongoose'
 import * as jwt from 'jsonwebtoken'
 import { Model } from 'mongoose'
 import { CreateJwtDto } from './dto/create-jwt.dto'
-import { UpdateJwtDto } from './dto/update-jwt.dto'
 import { Jwt } from './entities/jwt.entity'
 import { IDataToken } from './types'
 
@@ -28,28 +27,6 @@ export class JwtService {
 			refreshToken,
 			accessToken,
 		}
-	}
-
-	async update(id: string, updateJwtDto: UpdateJwtDto) {
-		const refreshToken = await this.generateRefreshToken(updateJwtDto)
-
-		const accessToken = this.getAccessToken(updateJwtDto)
-
-		await this.jwtModel.updateOne(
-			{ _id: id },
-			{
-				refreshToken,
-			},
-		)
-
-		return {
-			refreshToken,
-			accessToken,
-		}
-	}
-
-	async findById(id: string) {
-		return await this.jwtModel.findById({ _id: id })
 	}
 
 	async findByUserId(userId: string) {

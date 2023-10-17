@@ -22,7 +22,6 @@ import { RegistrationWithVKDto } from './dto/registrationWithVK.dto'
 export class AuthController {
 	constructor(private readonly authService: AuthService) {}
 
-	@Post('registration')
 	@ApiBody({
 		schema: {
 			type: 'object',
@@ -39,6 +38,7 @@ export class AuthController {
 			},
 		},
 	})
+	@Post('registration')
 	async registration(@Body() registrationDto: RegistrationDto) {
 		try {
 			return await this.authService.registration(registrationDto)
@@ -47,7 +47,6 @@ export class AuthController {
 		}
 	}
 
-	@Post('login')
 	@ApiBody({
 		schema: {
 			type: 'object',
@@ -64,6 +63,7 @@ export class AuthController {
 			},
 		},
 	})
+	@Post('login')
 	async login(
 		@Body() loginDto: LoginDto,
 		@Res({ passthrough: true }) res: Response,
@@ -80,7 +80,6 @@ export class AuthController {
 		}
 	}
 
-	@Post('login/google')
 	@ApiBody({
 		schema: {
 			type: 'object',
@@ -91,6 +90,7 @@ export class AuthController {
 			},
 		},
 	})
+	@Post('login/google')
 	async loginWithGoogle(
 		@Body() loginWithGoogleDto: LoginWithGoogleDto,
 		@Res({ passthrough: true }) res: Response,
@@ -107,7 +107,6 @@ export class AuthController {
 		}
 	}
 
-	@Post('registration/google')
 	@ApiBody({
 		schema: {
 			type: 'object',
@@ -118,6 +117,7 @@ export class AuthController {
 			},
 		},
 	})
+	@Post('registration/google')
 	async registrationWithGoogle(
 		@Body() registrationWithGoogleDto: RegistrationWithGoogleDto,
 	) {
@@ -130,7 +130,6 @@ export class AuthController {
 		}
 	}
 
-	@Post('login/vk')
 	@ApiBody({
 		schema: {
 			type: 'object',
@@ -144,6 +143,7 @@ export class AuthController {
 			},
 		},
 	})
+	@Post('login/vk')
 	async loginWithVk(
 		@Body() loginWithGoogleDto: LoginWithVkDto,
 		@Res({ passthrough: true }) res: Response,
@@ -160,7 +160,6 @@ export class AuthController {
 		}
 	}
 
-	@Post('registration/vk')
 	@ApiBody({
 		schema: {
 			type: 'object',
@@ -174,6 +173,7 @@ export class AuthController {
 			},
 		},
 	})
+	@Post('registration/vk')
 	async registrationWithVK(
 		@Body() registrationWithVKDto: RegistrationWithVKDto,
 	) {
@@ -188,7 +188,6 @@ export class AuthController {
 	async logout(@Res({ passthrough: true }) res: Response) {
 		try {
 			res.clearCookie('refreshToken')
-
 			return { success: true }
 		} catch (e) {
 			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
