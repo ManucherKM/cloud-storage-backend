@@ -67,7 +67,9 @@ export class JwtService {
 			throw new BadRequestException('Invalid token.')
 		}
 
-		return this.getAccessToken(dataToken)
+		return {
+			accessToken: this.getAccessToken(dataToken),
+		}
 	}
 
 	getAccessToken(payload: IDataToken) {
@@ -86,15 +88,6 @@ export class JwtService {
 		const foundToken = await this.jwtModel.findOne({ userId: payload.userId })
 
 		if (foundToken) {
-			const [isValid, _] = await this.validateToken(
-				foundToken.refreshToken,
-				'refresh',
-			)
-
-			if (isValid) {
-				return foundToken.refreshToken
-			}
-
 			const token = this.getRefreshToken(payload)
 
 			foundToken.refreshToken = token

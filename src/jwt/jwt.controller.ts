@@ -80,6 +80,7 @@ export class JwtController {
 	async getNewAccessToken(@Req() req: Request) {
 		try {
 			const refreshToken = req.cookies['refreshToken']
+
 			return await this.jwtService.getNewAccessToken(refreshToken)
 		} catch (e) {
 			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
