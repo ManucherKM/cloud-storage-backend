@@ -7,6 +7,7 @@ import {
 	Res,
 } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
+import env from 'env-var'
 import { ActivationService } from './activation.service'
 
 @ApiTags('Activation')
@@ -17,8 +18,9 @@ export class ActivationController {
 	@Get(':key')
 	async activationAccount(@Param('key') key: string, @Res() res) {
 		try {
+			const CLIENT_URL = env.get('CLIENT_URL').required().asString()
 			await this.activationService.activationAccount(key)
-			res.status(302).redirect(process.env.CLIENT_URL + '/auth/login')
+			res.status(302).redirect(CLIENT_URL + '/accountConfirm')
 			return { success: true }
 		} catch (e) {
 			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)

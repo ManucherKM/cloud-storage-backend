@@ -2,11 +2,13 @@ import { GoogleUserService } from '@/google-user/google-user.service'
 import { JwtService } from '@/jwt/jwt.service'
 import { UserService } from '@/user/user.service'
 import { getHash } from '@/utils/getHash'
+import { getHTMLForConfirmAccount } from '@/utils/getHTMLForConfirmAccount'
 import { VkUserService } from '@/vk-user/vk-user.service'
 import { MailerService } from '@nestjs-modules/mailer'
 import { BadRequestException, Injectable } from '@nestjs/common'
 import axios from 'axios'
 import { compare } from 'bcrypt'
+import env from 'env-var'
 import { verify } from 'hcaptcha'
 import { v4 } from 'uuid'
 import { LoginDto } from './dto/login.dto'
@@ -207,8 +209,8 @@ export class AuthService {
 			'https://oauth.vk.com/access_token',
 			{
 				params: {
-					client_id: process.env.VK_CLIENT_ID,
-					client_secret: process.env.VK_SECRET,
+					client_id: env.get('VK_CLIENT_ID').required().asString(),
+					client_secret: env.get('VK_SECRET').required().asString(),
 					redirect_uri: redirectUri,
 					code,
 				},
@@ -226,18 +228,22 @@ export class AuthService {
 		email: string,
 		activationKey: string,
 	) {
-		const activationLink =
-			process.env.API_URL + '/api/activation/' + activationKey
+		const API_URL = env.get('API_URL').required().asString()
+		const activationLink = API_URL + '/api/activation/' + activationKey
+
 		await this.mailerService.sendMail({
 			to: email,
-			from: process.env.NODEMAILER_USER,
+			from: env.get('NODEMAILER_USER').required().asString(),
 			subject: 'Cloud-Storage Account Confirmation.',
-			html: `<a href="${activationLink}">Click on the link.</a>`,
+			html: getHTMLForConfirmAccount(activationLink),
 		})
 	}
 
 	private async verifyHcaptcha(token: string) {
-		const { success } = await verify(process.env.HCAPTCHA_SECRET_KEY, token)
+		const { success } = await verify(
+			env.get('HCAPTCHA_SECRET_KEY').required().asString(),
+			token,
+		)
 		return success
 	}
 }

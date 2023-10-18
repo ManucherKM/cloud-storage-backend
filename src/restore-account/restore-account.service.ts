@@ -1,8 +1,10 @@
 import { JwtService } from '@/jwt/jwt.service'
 import { OtpService } from '@/otp/otp.service'
 import { UserService } from '@/user/user.service'
+import { getHTMLForOTP } from '@/utils/getHTMLForOTP'
 import { MailerService } from '@nestjs-modules/mailer'
 import { BadRequestException, Injectable } from '@nestjs/common'
+import env from 'env-var'
 import { CreateRestoreAccountDto } from './dto/create-restore-account.dto'
 import { VerificationOtpDto } from './dto/verification-otp.dto'
 
@@ -32,9 +34,9 @@ export class RestoreAccountService {
 	async sendOtpToEmail(otp: number, email: string) {
 		return await this.mailerService.sendMail({
 			to: email,
-			from: process.env.NODEMAILER_USER,
+			from: env.get('NODEMAILER_USER').required().asString(),
 			subject: 'Cloud-Storage account restore.',
-			html: `OTP code: ${otp}`,
+			html: getHTMLForOTP(otp),
 		})
 	}
 

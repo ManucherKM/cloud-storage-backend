@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
+import env from 'env-var'
 import { google } from 'googleapis'
 import { Model } from 'mongoose'
 import { CreateGoogleUserDto } from './dto/create-google-user.dto'
@@ -8,9 +9,9 @@ import { GoogleUser } from './entities/google-user.entity'
 @Injectable()
 export class GoogleUserService {
 	private readonly Oauth2Client = new google.auth.OAuth2(
-		process.env.GOOGLE_CLIENT_ID,
-		process.env.GOOGLE_CLIENT_SECRET,
-		process.env.CLIENT_URL,
+		env.get('GOOGLE_CLIENT_ID').required().asString(),
+		env.get('GOOGLE_CLIENT_SECRET').required().asString(),
+		env.get('CLIENT_URL').required().asString(),
 	)
 
 	constructor(

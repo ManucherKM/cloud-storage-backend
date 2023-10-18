@@ -4,6 +4,7 @@ import { EVariantGetData, getDataByToken } from '@/utils/getDataByToken'
 import { VkUserService } from '@/vk-user/vk-user.service'
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
+import env from 'env-var'
 import * as jwt from 'jsonwebtoken'
 import { Model } from 'mongoose'
 import { CreateJwtDto } from './dto/create-jwt.dto'
@@ -49,15 +50,23 @@ export class JwtService {
 	}
 
 	getAccessToken(payload: IDataToken) {
-		return jwt.sign(payload, process.env.JWT_ACCESS_SECRET, {
-			expiresIn: 30 * 60, // 30m
-		})
+		return jwt.sign(
+			payload,
+			env.get('JWT_ACCESS_SECRET').required().asString(),
+			{
+				expiresIn: 30 * 60, // 30m
+			},
+		)
 	}
 
 	private getRefreshToken(payload: IDataToken) {
-		return jwt.sign(payload, process.env.JWT_REFRESH_SECRET, {
-			expiresIn: 30 * 24 * 60 * 60, // 30d
-		})
+		return jwt.sign(
+			payload,
+			env.get('JWT_REFRESH_SECRET').required().asString(),
+			{
+				expiresIn: 30 * 24 * 60 * 60, // 30d
+			},
+		)
 	}
 
 	async generateRefreshToken(payload: IDataToken) {

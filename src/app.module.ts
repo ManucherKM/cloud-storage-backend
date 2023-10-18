@@ -2,6 +2,7 @@ import { MailerModule } from '@nestjs-modules/mailer'
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { MongooseModule } from '@nestjs/mongoose'
+import env from 'env-var'
 import { ActivationModule } from './activation/activation.module'
 import { ArchiveModule } from './archive/archive.module'
 import { AuthModule } from './auth/auth.module'
@@ -15,13 +16,13 @@ import { ThemeModule } from './theme/theme.module'
 @Module({
 	imports: [
 		ConfigModule.forRoot(),
-		MongooseModule.forRoot(process.env.MONGODB_URL),
+		MongooseModule.forRoot(env.get('MONGODB_URL').required().asString()),
 		MailerModule.forRoot({
 			transport: {
-				host: process.env.NODEMAILER_SMTP_HOST,
+				host: env.get('NODEMAILER_SMTP_HOST').required().asString(),
 				auth: {
-					user: process.env.NODEMAILER_USER,
-					pass: process.env.NODEMAILER_PASSWORD,
+					user: env.get('NODEMAILER_USER').required().asString(),
+					pass: env.get('NODEMAILER_PASSWORD').required().asString(),
 				},
 			},
 		}),
