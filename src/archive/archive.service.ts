@@ -73,7 +73,7 @@ export class ArchiveService {
 
 		for (const file of files) {
 			const filePath = path.join('uploads', file.fileName)
-			zip.addLocalFile(filePath)
+			zip.addLocalFile(filePath, undefined, file.originalName)
 		}
 
 		const zipBuffer = zip.toBuffer()
