@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config'
 import { MongooseModule } from '@nestjs/mongoose'
 import env from 'env-var'
 import { ActivationModule } from './activation/activation.module'
+import { AppController } from './app.controller'
 import { ArchiveModule } from './archive/archive.module'
 import { AuthModule } from './auth/auth.module'
 import { ConfigModule as UserConfigModule } from './config/config.module'
@@ -35,5 +36,6 @@ import { ThemeModule } from './theme/theme.module'
 		ThemeModule,
 		UserConfigModule,
 	],
+	controllers: [AppController],
 })
 export class AppModule {}
