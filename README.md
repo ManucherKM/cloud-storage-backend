@@ -1,9 +1,5 @@
 # 🚀 Cloud storage | Beta testing.
 
-[Demo](https://cloud-storage-indol.vercel.app)
-
-[Frontend](https://github.com/ManucherKM/cloud-storage)
-
 ## Languages and Tools
 ![Nestjs](https://img.shields.io/badge/-Nestjs-000?style=for-the-badge&logo=Nestjs&logoColor=e0234e)
 ![TypeScript](https://img.shields.io/badge/-TypeScript-000?style=for-the-badge&logo=TypeScript&logoColor=3178C6)
@@ -14,3 +10,13 @@
 ![Axios](https://img.shields.io/badge/-axios-000?style=for-the-badge&logo=axios&logoColor=5728dd)
 ![Git](https://img.shields.io/badge/-Git-000?style=for-the-badge&logo=Git&logoColor=e84d31)
 ![Prettier](https://img.shields.io/badge/-Prettier-000?style=for-the-badge&logo=Prettier&logoColor=426675)
+
+## Preview
+
+## Demo
+
+[Demo](https://quickfile-backend-production.up.railway.app/api)
+
+## Related
+
+[Frontend](https://github.com/ManucherKM/cloud-storage)
