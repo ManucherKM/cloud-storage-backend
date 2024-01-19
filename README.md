@@ -13,6 +13,8 @@
 
 ## Preview
 
+https://github.com/ManucherKM/cloud-storage-backend/assets/91463158/4a0ad4cb-6756-47da-97d1-7979d6b58a1f
+
 ## Demo
 
 [Demo](https://quickfile-backend-production.up.railway.app/api)
